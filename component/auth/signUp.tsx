@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { User, Mail, Phone } from "lucide-react";
 
 interface FormData {
@@ -21,6 +22,8 @@ export default function SignUp() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,9 +38,36 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      console.log("Form submitted:", formData);
+      // Map form to backend DTO
+      const payload = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phoneNumber,
+        address: ""
+      };
+
+      // Use local proxy route to avoid CORS / browser fetch issues
+      const res = await fetch(`/api/customers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json().catch(() => null);
+
+      if (res.ok) {
+        // created
+        setErrorMessage(null);
+        alert("Account created successfully.");
+        router.push("/login");
+      } else {
+        const message = result?.message ?? result?.Message ?? result?.errors ?? res.statusText ?? "Registration failed.";
+        setErrorMessage(typeof message === "string" ? message : JSON.stringify(message));
+      }
     } catch (error) {
       console.error("Error:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+      setErrorMessage(msg.includes("Failed to fetch") ? "Network error: could not reach backend. Is the backend running and correct NEXT_PUBLIC_API_URL set?" : msg);
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +94,7 @@ export default function SignUp() {
                 src="/PrecisionComponents.png"
                 alt="Precision mechanical component"
                 fill
+                sizes="(max-width: 640px) 100vw, 50vw"
                 priority
                 className="object-cover object-center"
               />

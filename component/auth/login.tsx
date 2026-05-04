@@ -3,14 +3,54 @@
 import { Eye, EyeOff, LockKeyhole, Mail, Zap } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [remember, setRemember] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const router = useRouter();
 
 	const footerLinks = ["Privacy Policy", "Terms of Service", "System Status"];
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setIsLoading(true);
+		setErrorMessage(null);
+
+		try {
+			const response = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, password }),
+			});
+
+			const result = await response.json().catch(() => null);
+
+			if (!response.ok) {
+				const message = result?.message ?? result?.Message ?? "Login failed.";
+				setErrorMessage(typeof message === "string" ? message : JSON.stringify(message));
+				return;
+			}
+
+			if (remember) {
+				localStorage.setItem("autoflow_auth", JSON.stringify(result?.data ?? result?.Data ?? null));
+			}
+
+			setErrorMessage(null);
+			router.push("/staff");
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			setErrorMessage(message.includes("Failed to fetch")
+				? "Network error: could not reach the login API proxy or backend."
+				: message);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	return (
 		<div className="min-h-screen bg-[#f3f5fb] px-4 py-8 text-slate-700">
@@ -26,7 +66,12 @@ export default function Login() {
 							<p className="mt-2 text-[13px] font-medium text-slate-500">Precision Management Portal</p>
 						</div>
 
-						<form className="mt-8 space-y-4" onSubmit={(e) => e.preventDefault()}>
+						<form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+							{errorMessage ? (
+								<div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+									{errorMessage}
+								</div>
+							) : null}
 							<div>
 								<label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.22em] text-slate-600">
 									Email Address
@@ -88,9 +133,10 @@ export default function Login() {
 
 							<button
 								type="submit"
+								disabled={isLoading}
 								className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#3f2fd8] to-[#5d56f0] px-4 py-3.5 text-base font-semibold text-white shadow-[0_8px_18px_rgba(63,47,216,0.28)] transition hover:brightness-105"
 							>
-								Login
+								{isLoading ? "Logging in..." : "Login"}
 							</button>
 
 							<div className="pt-7 text-center">
