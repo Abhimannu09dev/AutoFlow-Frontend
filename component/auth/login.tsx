@@ -153,14 +153,14 @@ export default function Login() {
 				</main>
 
 				<footer className=" flex flex-col items-center gap-4 pb-2 text-center">
-					<h2 className="text-[26px] font-semibold tracking-tight text-[#93a0b8]">Kinetic Atelier</h2>
+					<h2 className="text-[26px] font-semibold tracking-tight text-[#93a0b8]">AutoFlow</h2>
 					<nav className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#a2abc0]">
 						{footerLinks.map((item) => (
 							<span key={item}>{item}</span>
 						))}
 					</nav>
 					<p className="text-[11px] uppercase tracking-[0.22em] text-[#a2abc0]">
-						© 2026 Kinetic Atelier. Precision Palette Management.
+						© 2026 AutoFlow. Precision Palette Management.
 					</p>
 				</footer>
 			</div>
