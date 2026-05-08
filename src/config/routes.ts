@@ -11,6 +11,7 @@ export const ROUTES = {
   },
   staff: {
     dashboard: "/staff/dashboard",
+    parts: "/staff/parts",
     inventory: "/staff/inventory",
     repairOrders: "/staff/repair-orders",
     invoices: "/staff/invoices",
