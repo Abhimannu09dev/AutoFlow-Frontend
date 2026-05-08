@@ -1,7 +1,7 @@
 export const appConfig = {
   name: "AutoFlow",
   description: "Precision Management Portal",
-  backendUrl: process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000",
+  backendUrl: process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5294",
 } as const;
 
 export const apiRoutes = {
