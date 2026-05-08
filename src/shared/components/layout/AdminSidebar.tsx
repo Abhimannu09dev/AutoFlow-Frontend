@@ -56,7 +56,7 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col justify-between border-r border-[rgba(226,232,240,0.7)] bg-[#f8fafc] px-4 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-transform duration-300 lg:shadow-none ${
+      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col justify-between border-r border-[rgba(226,232,240,0.75)] bg-[#f8faff] px-4 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-transform duration-300 lg:shadow-none ${
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >
@@ -71,7 +71,7 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-[#64748b] transition hover:bg-[#eef2ff] hover:text-[#4338ca] lg:hidden"
+            className="rounded-lg p-1.5 text-[#64748b] transition hover:bg-white hover:text-[#4338ca] lg:hidden"
             aria-label="Close sidebar menu"
           >
             <X className="size-4" />
@@ -89,11 +89,12 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
                 key={it.key}
                 href={it.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
+                className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition ${
                   isActive
-                    ? "bg-[rgba(224,231,255,0.5)] text-[#4338ca]"
-                    : "text-[#64748b] hover:bg-[#eef2ff] hover:text-[#4338ca]"
+                    ? "bg-[linear-gradient(135deg,rgba(67,56,202,0.12),rgba(79,70,229,0.06))] text-[#4338ca] ring-1 ring-[rgba(67,56,202,0.08)]"
+                    : "text-[#64748b] hover:bg-white hover:text-[#4338ca]"
                 }`}
+                aria-current={isActive ? "page" : undefined}
               >
                 <Icon className="size-[18px] shrink-0" aria-hidden="true" />
                 <span className={isMultiLine ? "leading-5" : ""}>{it.label}</span>
@@ -106,7 +107,7 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
       <Link
         href="/staff/repair-orders"
         onClick={onClose}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3525cd] to-[#4f46e5] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_15px_-3px_rgba(53,37,205,0.2)]"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#3525cd] to-[#4f46e5] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_15px_-3px_rgba(53,37,205,0.2)] transition hover:brightness-105"
       >
         <PlusCircle className="size-4" aria-hidden="true" />
         New Service Order
