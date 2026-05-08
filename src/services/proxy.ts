@@ -1,7 +1,20 @@
 import { NextResponse } from "next/server";
 
 export function getBackendUrl(): string {
-  return process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+  return process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5294";
+}
+
+function getProxyHeaders(request: Request): HeadersInit {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  const authorization = request.headers.get("authorization");
+  if (authorization) {
+    headers.authorization = authorization;
+  }
+
+  return headers;
 }
 
 export async function proxyRequest(
@@ -12,8 +25,9 @@ export async function proxyRequest(
     const body = await request.json().catch(() => null);
     const res = await fetch(`${getBackendUrl()}${path}`, {
       method: request.method,
-      headers: { "Content-Type": "application/json" },
+      headers: getProxyHeaders(request),
       body: body ? JSON.stringify(body) : undefined,
+      cache: "no-store",
     });
     const text = await res.text();
     return new NextResponse(text, {
@@ -26,9 +40,12 @@ export async function proxyRequest(
   }
 }
 
-export async function proxyGet(path: string): Promise<NextResponse> {
+export async function proxyGet(path: string, request?: Request): Promise<NextResponse> {
   try {
-    const res = await fetch(`${getBackendUrl()}${path}`);
+    const res = await fetch(`${getBackendUrl()}${path}`, {
+      headers: request ? getProxyHeaders(request) : undefined,
+      cache: "no-store",
+    });
     const text = await res.text();
     return new NextResponse(text, {
       status: res.status,
