@@ -1,10 +1,6 @@
-import { proxyRequest } from "@/lib/api/proxy";
-import { apiRoutes } from "@/configs/app.config";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-<<<<<<< HEAD:app/api/auth/login/route.ts
-  return proxyRequest(request, apiRoutes.auth.login);
-=======
   try {
     const body = await request.json();
     const backend =
@@ -27,5 +23,4 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ status: false, message }, { status: 502 });
   }
->>>>>>> c197738c5467c58b7261bf149c4d09d68d7868a5:src/app/api/auth/login/route.ts
 }
