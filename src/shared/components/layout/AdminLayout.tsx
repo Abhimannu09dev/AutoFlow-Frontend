@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   return (
-    <div className="h-screen overflow-hidden bg-[linear-gradient(180deg,#f8faff_0%,#eef2ff_100%)] text-[#0b1c30]">
+    <div className="h-screen overflow-hidden bg-[#f8f9ff] text-[#0b1c30]">
       <div className="flex h-screen">
         <AdminNav
           isOpen={isMobileNavOpen}
@@ -39,8 +39,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="flex h-screen min-w-0 flex-1 flex-col lg:pl-64">
           <AdminHeader onMenuToggle={() => setIsMobileNavOpen((open) => !open)} />
-          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-10">
-            <div className="mx-auto w-full max-w-[1240px]">{children}</div>
+          <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
+            <div className="mx-auto w-full max-w-[1180px]">{children}</div>
           </main>
         </div>
       </div>
