@@ -1,6 +1,6 @@
 import {
   LayoutGrid, User, Car, CalendarCheck, Wrench, History, Star,
-  UserPlus, Users, FileText, BarChart3, Mail, Settings
+  UserPlus, Users, FileText, BarChart3, Mail, Settings, DollarSign
 } from "lucide-react";
 import type { NavItem } from "../components/layout/Sidebar";
 
@@ -25,7 +25,7 @@ export const staffNavItems: NavItem[] = [
 
 export const adminNavItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutGrid, href: "/admin/analytics" },
+  { label: "Financial Reports", icon: DollarSign, href: "/admin/financial-reports" },
   { label: "Users", icon: Users, href: "/admin/users" },
   { label: "Settings", icon: Settings, href: "/admin/settings" },
-  { label: "Analytics", icon: BarChart3, href: "/admin/analytics" },
 ];

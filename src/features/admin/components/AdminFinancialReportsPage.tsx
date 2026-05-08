@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
-import { TrendingUp, ShoppingCart, Zap, Download } from "lucide-react";
+import { TrendingUp, ShoppingCart, Zap, Download, Calendar, Filter } from "lucide-react";
+import AdminLayout from "@/shared/components/layout/AdminLayout";
 
 interface MetricCardProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -213,19 +216,24 @@ function PerformanceTable() {
 
 export default function FinancialReportsPage() {
   return (
-    <div className="w-full min-h-screen bg-[#f8fafc]">
-      <div className="h-full w-full px-8 py-8">
-        {/* Header */}
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Header Section */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-[36px] font-bold tracking-tight text-slate-900">Financial Insights</h1>
-            <p className="mt-1 text-[15px] text-slate-600">Monitoring revenue velocity and fiscal health across Atelier branches.</p>
+            <h1 className="text-[28px] font-bold tracking-tight text-slate-900">Financial Reports</h1>
+            <p className="mt-2 text-[14px] text-slate-600">Comprehensive financial analysis and reporting dashboard. Monitor revenue streams, expenses, and profitability metrics.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-white px-4 py-2 ring-1 ring-slate-200">
-              <p className="text-[13px] font-semibold text-slate-700">Oct 01, 2023 - Oct 31, 2023</p>
+          <div className="flex items-center gap-3">
+            <button className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
+              <Filter className="h-4 w-4" />
+              Filter
+            </button>
+            <div className="rounded-lg bg-white border border-slate-300 px-4 py-2 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-slate-400" />
+              <p className="text-sm font-semibold text-slate-700">Oct 01 - Oct 31, 2023</p>
             </div>
-            <button className="flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 font-semibold text-[#4d43e8] ring-1 ring-slate-200 hover:bg-slate-50">
+            <button className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white hover:bg-indigo-700 transition shadow-md">
               <Download className="h-4 w-4" />
               Export PDF
             </button>
@@ -233,7 +241,7 @@ export default function FinancialReportsPage() {
         </div>
 
         {/* Metric Cards */}
-        <div className="mb-8 grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
             icon={TrendingUp}
             title="Total Revenue"
@@ -246,7 +254,7 @@ export default function FinancialReportsPage() {
         </div>
 
         {/* Charts Grid */}
-        <div className="mb-8 grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Revenue Velocity */}
           <div className="rounded-[14px] bg-white p-6 shadow-[0_1px_6px_rgba(15,23,42,0.08)] ring-1 ring-slate-200">
             <div className="mb-6 flex items-center justify-between">
@@ -292,6 +300,6 @@ export default function FinancialReportsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
