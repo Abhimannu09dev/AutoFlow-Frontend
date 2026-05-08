@@ -4,7 +4,6 @@ import {
   Box,
   CircleDollarSign,
   CircleCheck,
-  Gauge,
   Users,
   BadgeAlert,
   FileText,

@@ -1,5 +1,5 @@
-import SectionCard from "@/components/ui/SectionCard";
-import Badge from "@/components/ui/Badge";
+import SectionCard from "@/shared/components/ui/SectionCard";
+import Badge from "@/shared/components/ui/Badge";
 
 interface SaleRow {
   time: string;

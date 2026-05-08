@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ShieldCheck, Eye, EyeOff } from "lucide-react";
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 export default function PasswordForm() {
   const [newPassword, setNewPassword] = useState("");

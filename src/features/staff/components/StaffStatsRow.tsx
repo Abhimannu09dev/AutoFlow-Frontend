@@ -1,5 +1,5 @@
 import { ShoppingCart, Users, FileText, CreditCard } from "lucide-react";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/shared/components/ui/StatCard";
 
 const statCards = [
   { label: "Today's Sales", value: "$4,250", icon: ShoppingCart, iconBg: "bg-[#ede9fe]", iconColor: "text-[#7c3aed]", badge: "+12% vs yesterday", badgeColor: "bg-[#e8f5e9] text-[#2e7d32]" },
