@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import {
-  UserPlus, Users, FileText, BarChart3, Mail,
-  Search, Bell, Download, RefreshCw, UserRoundPlus, UserSearch,
-  ShoppingCart, SendHorizonal, CirclePlus,
+  Download, RefreshCw, UserRoundPlus, UserSearch,
+  ShoppingCart, SendHorizonal,
 } from "lucide-react";
 import { DashboardLayout } from "../../../shared/components/layout/DashboardLayout";
 import { staffNavItems } from "../../../shared/constants/navigation";

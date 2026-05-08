@@ -1,5 +1,4 @@
-import { proxyRequest } from "@/lib/api/proxy";
-import { apiRoutes } from "@/configs/app.config";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {

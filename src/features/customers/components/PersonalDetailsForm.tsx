@@ -1,7 +1,7 @@
 "use client";
 
-import FormField from "@/components/ui/FormField";
-import SectionCard from "@/components/ui/SectionCard";
+import FormField from "@/shared/components/ui/FormField";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 interface PersonalDetailsFormProps {
   fullName: string;

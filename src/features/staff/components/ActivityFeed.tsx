@@ -1,4 +1,4 @@
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 const recentActivity = [
   { title: "New Registration", desc: "David Chen joined as a Premium Member.", time: "2 mins ago", dot: "bg-[#4338ca]" },

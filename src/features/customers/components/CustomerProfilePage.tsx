@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Save, CheckCircle2 } from "lucide-react";
-import CustomerShell from "@/components/layout/CustomerShell";
-import PageHeader from "@/components/ui/PageHeader";
-import PersonalDetailsForm from "@/components/customer/PersonalDetailsForm";
-import PasswordForm from "@/components/customer/PasswordForm";
-import MembershipCard from "@/components/customer/MembershipCard";
+import CustomerShell from "@/shared/components/layout/CustomerShell";
+import PageHeader from "@/shared/components/ui/PageHeader";
+import PersonalDetailsForm from "@/features/customers/components/PersonalDetailsForm";
+import PasswordForm from "@/features/customers/components/PasswordForm";
+import MembershipCard from "@/features/customers/components/MembershipCard";
 
 export default function CustomerProfile() {
   const [fullName, setFullName] = useState("Julianne Blackwood");

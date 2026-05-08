@@ -1,5 +1,5 @@
-import { proxyRequest, proxyGet } from "@/lib/api/proxy";
-import { apiRoutes } from "@/configs/app.config";
+import { proxyRequest, proxyGet } from "@/services/proxy";
+import { apiRoutes } from "@/config/app.config";
 
 export async function POST(request: Request) {
   return proxyRequest(request, apiRoutes.partsRequests);
