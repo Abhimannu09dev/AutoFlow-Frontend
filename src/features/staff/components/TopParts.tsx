@@ -1,4 +1,4 @@
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 const topParts = [
   { name: "V8 Spark Plugs", sub: "High Demand", subColor: "text-[#4338ca]", icon: "⚙️" },

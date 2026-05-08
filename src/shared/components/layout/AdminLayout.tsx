@@ -1,6 +1,6 @@
 import React from "react";
-import AdminNav from "../../component/auth/admin/sharded/nav";
-import AdminHeader from "../../component/auth/admin/sharded/header";
+import AdminNav from "./AdminSidebar";
+import AdminHeader from "./AdminHeader";
 
 export const metadata = {
   title: "Admin - AutoFlow",

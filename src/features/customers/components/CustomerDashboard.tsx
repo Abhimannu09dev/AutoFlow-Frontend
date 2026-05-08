@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  CalendarCheck, Wrench, ShoppingCart, PlusCircle, Package, CheckCircle,
+  CalendarCheck, ShoppingCart, PlusCircle, Package, CheckCircle,
   ShoppingBag, Clock, ChevronRight, ArrowRight,
 } from "lucide-react";
 import { DashboardLayout } from "../../../shared/components/layout/DashboardLayout";

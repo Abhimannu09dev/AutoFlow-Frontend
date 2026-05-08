@@ -5,7 +5,6 @@ const isDev = process.env.NODE_ENV === "development";
 function log(level: LogLevel, message: string, ...args: unknown[]) {
   if (!isDev && level === "debug") return;
   const prefix = `[AutoFlow:${level.toUpperCase()}]`;
-  // eslint-disable-next-line no-console
   console[level === "debug" ? "log" : level](prefix, message, ...args);
 }
 
