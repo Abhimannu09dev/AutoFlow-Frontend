@@ -1,5 +1,5 @@
 import { ShoppingCart, CalendarCheck, Car } from "lucide-react";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/shared/components/ui/StatCard";
 
 const stats = [
   {

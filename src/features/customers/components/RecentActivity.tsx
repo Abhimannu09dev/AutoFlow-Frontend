@@ -1,5 +1,5 @@
 import { CheckCircle, ShoppingBag, Clock, ChevronRight, LucideIcon } from "lucide-react";
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 interface ActivityItem {
   title: string;

@@ -1,5 +1,5 @@
 import { UserRoundPlus, UserSearch, ShoppingCart, SendHorizonal, LucideIcon } from "lucide-react";
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 const actions: { label: string; icon: LucideIcon }[] = [
   { label: "Register Customer", icon: UserRoundPlus },

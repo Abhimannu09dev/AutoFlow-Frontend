@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { Box, Users, Truck, ClipboardList, FileText, Bell } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface AdminNavItem {
+	key: string;
+	label: string;
+	href: string;
+	icon: LucideIcon;
+}
 
 export default function AdminNav() {
-	const items = [
+	const items: AdminNavItem[] = [
 		{ key: "dashboard", label: "Dashboard", href: "/staff", icon: Box },
 		{ key: "staff", label: "Staff Management", href: "/staff", icon: Users },
 		{ key: "vendor", label: "Vendor Management", href: "/staff/vendor", icon: Truck },
@@ -24,7 +32,7 @@ export default function AdminNav() {
 
 			<nav className="flex flex-col gap-2">
 				{items.map((it) => {
-					const Icon = it.icon as any;
+					const Icon = it.icon;
 					return (
 						<Link
 							key={it.key}
@@ -46,4 +54,3 @@ export default function AdminNav() {
 		</aside>
 	);
 }
-

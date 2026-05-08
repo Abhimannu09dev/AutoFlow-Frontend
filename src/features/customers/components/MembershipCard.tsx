@@ -1,5 +1,5 @@
 import { Award } from "lucide-react";
-import SectionCard from "@/components/ui/SectionCard";
+import SectionCard from "@/shared/components/ui/SectionCard";
 
 export default function MembershipCard() {
   return (

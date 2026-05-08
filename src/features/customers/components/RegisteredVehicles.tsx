@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { PlusCircle } from "lucide-react";
-import SectionCard from "@/components/ui/SectionCard";
-import Badge from "@/components/ui/Badge";
+import SectionCard from "@/shared/components/ui/SectionCard";
+import Badge from "@/shared/components/ui/Badge";
 
 interface Vehicle {
   name: string;
