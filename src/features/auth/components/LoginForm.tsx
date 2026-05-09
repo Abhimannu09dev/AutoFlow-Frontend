@@ -1,9 +1,11 @@
 "use client";
 
 import { Eye, EyeOff, LockKeyhole, Mail, Zap } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../contexts/AuthContext";
+import { AuthService } from "../../../services/auth.service";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -12,40 +14,84 @@ export function LoginForm() {
   const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const footerLinks = ["Privacy Policy", "Terms of Service", "System Status"];
 
+  // Ensure component only renders on client side to avoid hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('LoginForm: handleSubmit called'); // Debug log
     e.preventDefault();
+    console.log('LoginForm: preventDefault called, about to start login process'); // Debug log
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const message = result?.message ?? result?.Message ?? "Login failed.";
-        setErrorMessage(typeof message === "string" ? message : JSON.stringify(message));
+      console.log('Attempting login with:', { email }); // Debug log
+      console.log('Login function:', typeof login); // Debug log
+      console.log('Login function exists:', !!login); // Debug log
+      
+      if (!login) {
+        console.error('Login function is not available!');
+        setErrorMessage("Authentication system error. Please refresh the page.");
         return;
       }
 
-      if (remember) {
-        localStorage.setItem(
-          "autoflow_auth",
-          JSON.stringify(result?.data ?? result?.Data ?? null)
-        );
+      // Test direct API call first
+      console.log('Testing direct API call...');
+      try {
+        const testResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        console.log('Direct API test - Status:', testResponse.status);
+        console.log('Direct API test - OK:', testResponse.ok);
+        const testResult = await testResponse.json();
+        console.log('Direct API test - Result:', testResult);
+        
+        // If direct API call works, the issue is in AuthService
+        if (testResponse.ok && (testResult.IsSuccess || testResult.isSuccess)) {
+          console.log('Direct API call succeeded, issue is in AuthService.login');
+        }
+      } catch (testError) {
+        console.error('Direct API test failed:', testError);
       }
-
-      setErrorMessage(null);
-      router.push("/staff/dashboard");
+      
+      const success = await login(email, password);
+      
+      console.log('Login result:', success); // Debug log
+      
+      if (success) {
+        // Store in localStorage if remember is checked
+        if (remember && typeof window !== 'undefined') {
+          localStorage.setItem("autoflow_remember", "true");
+        }
+        
+        console.log('Login successful, redirecting to dashboard...'); // Debug log
+        
+        // Wait a moment for the user state to be set, then redirect based on role
+        setTimeout(() => {
+          const currentUser = AuthService.getCurrentUser();
+          if (currentUser?.roles?.includes('Admin')) {
+            router.push("/admin/dashboard");
+          } else if (currentUser?.roles?.includes('Staff')) {
+            router.push("/staff/dashboard");
+          } else {
+            router.push("/customer/dashboard");
+          }
+        }, 100);
+      } else {
+        setErrorMessage("Invalid email or password. Please try again.");
+      }
     } catch (error) {
+      console.error('Login form error:', error); // Debug log
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(
         message.includes("Failed to fetch")
@@ -56,6 +102,34 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state until component is mounted on client
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-[#f3f5fb] px-4 py-8 text-slate-700">
+        <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[920px] flex-col items-center justify-center gap-4">
+          <main className="flex w-full justify-center py-20">
+            <section className="w-full max-w-[410px] rounded-2xl bg-white px-6 pb-8 pt-7 shadow-[0_18px_40px_rgba(85,93,128,0.12)] ring-1 ring-black/5 sm:px-7">
+              <div className="flex flex-col items-center text-center">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-[#efeefe] text-[#4f46e5] shadow-[0_2px_6px_rgba(79,70,229,0.08)]">
+                  <Zap size={22} strokeWidth={2.4} aria-hidden="true" />
+                </div>
+                <h1 className="mt-4 text-[28px] font-semibold leading-none tracking-tight text-slate-800">
+                  AutoFlow
+                </h1>
+                <p className="mt-2 text-[13px] font-medium text-slate-500">
+                  Precision Management Portal
+                </p>
+              </div>
+              <div className="mt-8 flex items-center justify-center">
+                <div className="text-slate-500">Loading...</div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f3f5fb] px-4 py-8 text-slate-700">
@@ -95,6 +169,7 @@ export function LoginForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@autoflow.com"
                     required
+                    suppressHydrationWarning
                     className="w-full rounded-xl border border-[#edf0f6] bg-white py-3 pl-10 pr-4 text-sm text-slate-800 outline-none placeholder:text-slate-300 focus:border-[#d9def0] focus:ring-2 focus:ring-[#dad8ff]"
                   />
                 </div>
@@ -114,6 +189,7 @@ export function LoginForm() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
+                    suppressHydrationWarning
                     className="w-full rounded-xl border border-[#edf0f6] bg-white py-3 pl-10 pr-10 text-sm text-slate-800 outline-none placeholder:text-slate-300 focus:border-[#d9def0] focus:ring-2 focus:ring-[#dad8ff]"
                   />
                   <button
@@ -121,6 +197,7 @@ export function LoginForm() {
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                     aria-label="Toggle password visibility"
+                    suppressHydrationWarning
                   >
                     {showPassword ? (
                       <EyeOff size={18} strokeWidth={2} aria-hidden="true" />
@@ -152,6 +229,8 @@ export function LoginForm() {
               <button
                 type="submit"
                 disabled={isLoading}
+                suppressHydrationWarning
+                onClick={() => console.log('Login button clicked!')}
                 className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#3f2fd8] to-[#5d56f0] px-4 py-3.5 text-base font-semibold text-white shadow-[0_8px_18px_rgba(63,47,216,0.28)] transition hover:brightness-105 disabled:opacity-60"
               >
                 {isLoading ? "Logging in…" : "Login"}
