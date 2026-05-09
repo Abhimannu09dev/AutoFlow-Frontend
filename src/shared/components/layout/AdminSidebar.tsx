@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { ROUTES } from "@/config/routes";
+
 interface AdminNavItem {
   key: string;
   label: string;
@@ -30,8 +32,8 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
   const pathname = usePathname();
 
   const items: AdminNavItem[] = [
-    { key: "dashboard", label: "Dashboard", href: "/admin/dashboard", icon: Box },
-    { key: "staff", label: "Staff Management", href: "/admin/users", icon: Users },
+    { key: "dashboard", label: "Dashboard", href: ROUTES.admin.dashboard, icon: Box },
+    { key: "staff", label: "Staff Management", href: ROUTES.admin.users, icon: Users },
     { key: "vendor", label: "Vendor Management", href: "/staff/vendor", icon: Truck },
     {
       key: "parts",
@@ -42,7 +44,7 @@ export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
     {
       key: "invoices",
       label: "Purchase Invoice Management",
-      href: "/staff/invoices",
+      href: ROUTES.admin.purchaseInvoices,
       icon: FileText,
     },
     {

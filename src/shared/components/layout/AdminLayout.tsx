@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex h-screen min-w-0 flex-1 flex-col lg:pl-64">
           <AdminHeader onMenuToggle={() => setIsMobileNavOpen((open) => !open)} />
           <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
-            <div className="mx-auto w-full max-w-[1180px]">{children}</div>
+            <div className="w-full">{children}</div>
           </main>
         </div>
       </div>

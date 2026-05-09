@@ -1,6 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import { Bell, Menu, Search, Settings } from "lucide-react";
+
+import { ROUTES } from "@/config/routes";
 
 interface AdminHeaderProps {
   onMenuToggle: () => void;
@@ -19,7 +23,9 @@ export default function AdminHeader({ onMenuToggle }: AdminHeaderProps) {
           >
             <Menu className="size-5" aria-hidden="true" />
           </button>
-          <span className="text-sm font-semibold text-[#4338ca]">AutoFlow</span>
+          <Link href={ROUTES.admin.dashboard} className="text-sm font-semibold text-[#4338ca]">
+            AutoFlow
+          </Link>
         </div>
 
         <div className="hidden w-full max-w-96 items-center rounded-full border border-[rgba(199,196,216,0.2)] bg-[#eff4ff] px-4 py-2 lg:flex">
@@ -40,13 +46,13 @@ export default function AdminHeader({ onMenuToggle }: AdminHeaderProps) {
             >
               <Bell className="size-4" aria-hidden="true" />
             </button>
-            <button
-              type="button"
+            <Link
+              href={ROUTES.admin.settings}
               className="inline-flex items-center justify-center rounded-full p-1.5 transition hover:bg-[#eff4ff] hover:text-[#4338ca]"
               aria-label="Settings"
             >
               <Settings className="size-4" aria-hidden="true" />
-            </button>
+            </Link>
           </div>
 
           <span className="hidden h-8 w-px bg-[rgba(199,196,216,0.4)] sm:block" />
