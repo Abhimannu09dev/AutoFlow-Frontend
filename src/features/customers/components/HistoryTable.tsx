@@ -133,7 +133,9 @@ export function HistoryTable() {
     );
   }
 
-  const renderCell = (key: string, value: any, row: HistoryTableData) => {
+  const renderCell = (key: string, value: any, row: Record<string, any>) => {
+    const typedRow = row as HistoryTableData;
+    
     switch (key) {
       case "invoiceId":
         return (
@@ -152,7 +154,7 @@ export function HistoryTable() {
       case "action":
         return (
           <button 
-            onClick={() => handleViewInvoice(row.originalData)}
+            onClick={() => handleViewInvoice(typedRow.originalData)}
             className="flex items-center gap-1 text-[#4338ca] hover:underline text-[12px] font-medium"
           >
             <Eye size={14} />

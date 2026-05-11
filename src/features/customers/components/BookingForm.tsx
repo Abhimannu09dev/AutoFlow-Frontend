@@ -25,11 +25,11 @@ interface BookingFormErrors {
 }
 
 const serviceTypes = [
-  { value: "oil-change-filter", label: "Oil Change & Filter Service" },
-  { value: "brake-inspection", label: "Brake Inspection & Service" },
-  { value: "engine-diagnostic", label: "Engine Diagnostic" },
-  { value: "transmission-service", label: "Transmission Service" },
-  { value: "tire-rotation", label: "Tire Rotation & Balance" },
+  { value: "oil-change-filter", label: "Oil Change & Filter Service", price: 285.00 },
+  { value: "brake-inspection", label: "Brake Inspection & Service", price: 450.00 },
+  { value: "engine-diagnostic", label: "Engine Diagnostic", price: 195.00 },
+  { value: "transmission-service", label: "Transmission Service", price: 650.00 },
+  { value: "tire-rotation", label: "Tire Rotation & Balance", price: 125.00 },
 ];
 
 export function BookingForm({ vehicles, customerId }: BookingFormProps) {
@@ -420,7 +420,9 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
             <div className="border-t border-[#d1d9ff] pt-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[15px] font-medium text-[#0f172a]">Total Est.</span>
-                <span className="text-[24px] font-bold text-[#4338ca]">$285.00</span>
+                <span className="text-[24px] font-bold text-[#4338ca]">
+                  ${(serviceTypes.find(s => s.value === formData.serviceType)?.price || 285.00).toFixed(2)}
+                </span>
               </div>
               <p className="text-[11px] text-[#64748b]">
                 Tax and additional parts may vary upon physical inspection of the vehicle.

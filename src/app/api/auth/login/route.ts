@@ -1,10 +1,6 @@
-import { proxyRequest } from "@/services/proxy";
-import { apiRoutes } from "@/config/app.config";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-<<<<<<< Updated upstream
-  return proxyRequest(request, apiRoutes.auth.login);
-=======
   try {
     const body = await request.json();
     const { email, password } = body;
@@ -55,5 +51,4 @@ export async function POST(request: Request) {
       ErrorType: 0
     }, { status: 500 });
   }
->>>>>>> Stashed changes
 }

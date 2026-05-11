@@ -208,7 +208,7 @@ export default function VehiclesPage() {
       brand: vehicle.brand,
       model: vehicle.model,
       year: vehicle.year.toString(),
-      vin: vehicle.vin,
+      vin: vehicle.vin || "",
       mileage: vehicle.mileage.toString(),
       color: vehicle.color || ""
     });
