@@ -10,9 +10,9 @@ export const customerNavItems: NavItem[] = [
   { label: "Profile", icon: User, href: "/customer/profile" },
   { label: "Vehicles", icon: Car, href: "/customer/vehicles" },
   { label: "Book Service", icon: CalendarCheck, href: "/customer/appointments" },
-  { label: "Request Parts", icon: Wrench, href: "/customer/appointments" },
-  { label: "History", icon: History, href: "#", disabled: true },
-  { label: "Reviews", icon: Star, href: "#", disabled: true },
+  { label: "Request Parts", icon: Wrench, href: "/customer/parts-request" },
+  { label: "History", icon: History, href: "/customer/history" },
+  { label: "Reviews", icon: Star, href: "/customer/reviews" },
 ];
 
 export const staffNavItems: NavItem[] = [

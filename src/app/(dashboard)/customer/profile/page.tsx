@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutGrid,
   User,
@@ -19,6 +19,9 @@ import {
   ArrowRight,
   Shield,
 } from "lucide-react";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { useCustomerData } from "../../../../hooks/useCustomer";
+import { CustomerProfileService } from "../../../../services/customerProfile.service";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutGrid, href: "/customer/dashboard" },
@@ -61,27 +64,166 @@ function Field({
 
 export default function ProfilePage() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const { customer, isLoading, error, refetchData } = useCustomerData();
 
-  // Personal details state
-  const [fullName,  setFullName]  = useState("Julianne Blackwood");
-  const [email,     setEmail]     = useState("j.blackwood@nexus.com");
-  const [phone,     setPhone]     = useState("+1 (555) 234-8901");
-  const [location,  setLocation]  = useState("San Francisco, CA");
-  const [bio,       setBio]       = useState(
-    "Passionate car enthusiast and technology professional. Always looking for the best performance parts for my collection."
-  );
+  // Personal details state - initialize with backend data when available
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [bio, setBio] = useState("");
+
+  // Update form fields when customer data loads
+  useEffect(() => {
+    if (customer) {
+      setFullName(customer.fullName || "");
+      setEmail(customer.email || "");
+      setPhone(customer.phone || "");
+      setLocation(customer.address || "");
+      setBio("Passionate car enthusiast and technology professional. Always looking for the best performance parts for my collection.");
+    }
+  }, [customer]);
 
   // Password state
-  const [currentPw, setCurrentPw] = useState("••••••••••••");
-  const [newPw,     setNewPw]     = useState("");
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
 
-  // Toast
+  // 2FA state
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
+  const [show2FAModal, setShow2FAModal] = useState(false);
+
+  // Toast and loading states
   const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleSave = async () => {
+    console.log('Profile save clicked', { fullName, email, phone, location, bio });
+    
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+      
+      // Validate required fields
+      if (!fullName || !email) {
+        setSaveError('Name and email are required');
+        return;
+      }
+
+      // Call the API to update profile
+      const response = await CustomerProfileService.updateProfile({
+        fullName,
+        email,
+        phone,
+        address: location
+      });
+
+      console.log('Profile update response:', response);
+
+      if (response.isSuccess) {
+        console.log('Profile updated successfully:', response.data);
+        
+        // Refresh customer data to show updated information
+        await refetchData();
+        
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setSaveError(response.message || 'Failed to save profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      setSaveError('Failed to save profile. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const handlePasswordChange = async () => {
+    console.log('Password change clicked');
+    
+    try {
+      setPasswordError(null);
+      
+      // Validate password fields
+      if (!currentPw || !newPw || !confirmPw) {
+        setPasswordError('All password fields are required');
+        return;
+      }
+      
+      if (newPw !== confirmPw) {
+        setPasswordError('New passwords do not match');
+        return;
+      }
+      
+      if (newPw.length < 8) {
+        setPasswordError('New password must be at least 8 characters');
+        return;
+      }
+      
+      // In a real implementation, this would call an API to change the password
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('Password change successful');
+      
+      // Clear password fields
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setPasswordError('Failed to change password. Please try again.');
+    }
+  };
+
+  const handle2FAToggle = () => {
+    console.log('2FA toggle clicked', { currentState: twoFactorEnabled });
+    setShow2FAModal(true);
+  };
+
+  const confirm2FAToggle = async () => {
+    try {
+      // In a real implementation, this would call an API to toggle 2FA
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setTwoFactorEnabled(!twoFactorEnabled);
+      setShow2FAModal(false);
+      
+      console.log('2FA toggled:', !twoFactorEnabled);
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Error toggling 2FA:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f3f5fb] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4338ca] mx-auto"></div>
+          <p className="mt-2 text-[13px] text-[#64748b]">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f3f5fb] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[13px] text-red-600">Error loading profile: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f3f5fb] text-[#1f2937]">
@@ -121,8 +263,8 @@ export default function ProfilePage() {
           <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-[#e8eaf2] bg-[#f8f9fc] px-3 py-2.5">
             <div className="size-8 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8]" />
             <div className="min-w-0">
-              <p className="truncate text-[12px] font-semibold text-[#1e293b]">Julianne Blackw...</p>
-              <p className="text-[10px] uppercase tracking-wide text-[#94a3b8]">Premium Member</p>
+              <p className="truncate text-[12px] font-semibold text-[#1e293b]">{user?.name || "User"}</p>
+              <p className="text-[10px] uppercase tracking-wide text-[#94a3b8]">{user?.role || "Member"}</p>
             </div>
           </div>
         </aside>
@@ -150,9 +292,9 @@ export default function ProfilePage() {
                 </button>
                 <div className="flex items-center gap-2">
                   <div className="text-right leading-tight">
-                    <p className="text-[12px] font-semibold text-[#0f172a]">Alex Sterling</p>
+                    <p className="text-[12px] font-semibold text-[#0f172a]">{user?.name || "User"}</p>
                     <p className="text-[9px] font-semibold uppercase tracking-wide text-[#4338ca]">
-                      Premium Member
+                      {user?.role || "Member"}
                     </p>
                   </div>
                   <div className="size-8 rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8] ring-2 ring-white" />
@@ -177,6 +319,12 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-2 rounded-full border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-2 text-[12px] font-semibold text-[#16a34a] shadow-sm">
                   <CheckCircle2 size={14} aria-hidden="true" />
                   Profile updated successfully
+                </div>
+              )}
+
+              {saveError && (
+                <div className="flex items-center gap-2 rounded-full border border-[#fecaca] bg-[#fef2f2] px-4 py-2 text-[12px] font-semibold text-[#dc2626] shadow-sm">
+                  {saveError}
                 </div>
               )}
             </div>
@@ -257,6 +405,7 @@ export default function ProfilePage() {
                       value={currentPw}
                       onChange={setCurrentPw}
                       type="password"
+                      placeholder="Enter current password"
                     />
                     <Field
                       label="New Password"
@@ -265,21 +414,48 @@ export default function ProfilePage() {
                       type="password"
                       placeholder="Enter new password"
                     />
+                    <div className="sm:col-span-2">
+                      <Field
+                        label="Confirm New Password"
+                        value={confirmPw}
+                        onChange={setConfirmPw}
+                        type="password"
+                        placeholder="Confirm new password"
+                      />
+                    </div>
                   </div>
+
+                  {passwordError && (
+                    <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+                      <p className="text-[12px] text-red-600">{passwordError}</p>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handlePasswordChange}
+                    className="mt-4 flex items-center gap-2 rounded-xl bg-[#4338ca] px-4 py-2 text-[13px] font-semibold text-white transition hover:brightness-105"
+                  >
+                    <LockKeyhole size={14} aria-hidden="true" />
+                    Change Password
+                  </button>
 
                   <div className="mt-5 flex items-center justify-between rounded-xl border border-[#e8eaf2] bg-[#f8f9fc] px-4 py-3">
                     <div className="flex items-center gap-3">
                       <Shield size={16} className="text-[#4338ca]" aria-hidden="true" />
                       <span className="text-[13px] font-semibold text-[#1e293b]">
                         Two-Factor Authentication is currently{" "}
-                        <span className="text-[#4338ca]">ON</span>
+                        <span className={twoFactorEnabled ? "text-[#16a34a]" : "text-[#dc2626]"}>
+                          {twoFactorEnabled ? "ON" : "OFF"}
+                        </span>
                       </span>
                     </div>
                     <button
                       type="button"
+                      onClick={handle2FAToggle}
                       className="flex items-center gap-1 text-[12px] font-semibold text-[#4338ca] hover:underline"
                     >
-                      Manage <ArrowRight size={13} aria-hidden="true" />
+                      {twoFactorEnabled ? "Disable" : "Enable"} <ArrowRight size={13} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -299,10 +475,11 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-[13px] font-bold text-[#4338ca] shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition hover:bg-[#f5f6ff]"
+                    disabled={isSaving}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-[13px] font-bold text-[#4338ca] shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition hover:bg-[#f5f6ff] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <Save size={15} aria-hidden="true" />
-                    Save Changes
+                    {isSaving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
 
@@ -314,8 +491,8 @@ export default function ProfilePage() {
                       <User size={18} className="text-[#6ee7b7]" aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="text-[14px] font-bold text-[#0f172a]">Platinum Member</p>
-                      <p className="text-[11px] text-[#94a3b8]">Since October 2022</p>
+                      <p className="text-[14px] font-bold text-[#0f172a]">{user?.role === 'customer' ? 'Premium Member' : user?.role || 'Member'}</p>
+                      <p className="text-[11px] text-[#94a3b8]">Since {customer?.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}</p>
                     </div>
                   </div>
 
@@ -340,6 +517,54 @@ export default function ProfilePage() {
           </main>
         </div>
       </div>
+
+      {/* 2FA Confirmation Modal */}
+      {show2FAModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-[#eef0fb] text-[#4338ca]">
+                <Shield size={24} strokeWidth={1.8} aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="text-[18px] font-bold text-[#0f172a]">
+                  {twoFactorEnabled ? 'Disable' : 'Enable'} Two-Factor Authentication
+                </h3>
+                <p className="text-[12px] text-[#64748b]">
+                  {twoFactorEnabled 
+                    ? 'Your account will be less secure without 2FA' 
+                    : 'Add an extra layer of security to your account'}
+                </p>
+              </div>
+            </div>
+
+            <p className="mb-6 text-[13px] text-[#64748b]">
+              {twoFactorEnabled
+                ? 'Are you sure you want to disable two-factor authentication? This will make your account more vulnerable to unauthorized access.'
+                : 'Two-factor authentication adds an extra layer of security by requiring a verification code in addition to your password when signing in.'}
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShow2FAModal(false)}
+                className="flex-1 rounded-xl border border-[#e8eaf2] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#64748b] transition hover:bg-[#f8f9fc]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirm2FAToggle}
+                className={`flex-1 rounded-xl px-4 py-2.5 text-[13px] font-semibold text-white transition hover:brightness-105 ${
+                  twoFactorEnabled ? 'bg-[#dc2626]' : 'bg-[#16a34a]'
+                }`}
+              >
+                {twoFactorEnabled ? 'Disable' : 'Enable'} 2FA
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
