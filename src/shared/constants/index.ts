@@ -15,8 +15,10 @@ export const ROUTES = {
   staffRepairOrders: "/staff/repair-orders",
   staffInvoices: "/staff/invoices",
   adminUsers: "/admin/users",
+  adminDashboard: "/admin/dashboard",
   adminSettings: "/admin/settings",
   adminAnalytics: "/admin/analytics",
+  adminPurchaseInvoices: "/admin/purchase-invoices",
 } as const;
 
 export * from "./navigation";

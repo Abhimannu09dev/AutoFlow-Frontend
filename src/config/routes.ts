@@ -16,8 +16,10 @@ export const ROUTES = {
     invoices: "/staff/invoices",
   },
   admin: {
+    dashboard: "/admin/dashboard",
     users: "/admin/users",
     settings: "/admin/settings",
     analytics: "/admin/analytics",
+    purchaseInvoices: "/admin/purchase-invoices",
   },
 } as const;
