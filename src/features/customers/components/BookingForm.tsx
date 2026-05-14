@@ -87,7 +87,7 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
   };
 
   const handleSubmit = async () => {
-    console.log('BookingForm handleSubmit called', { customerId, formData });
+
     
     if (!customerId) {
       setSubmitError("User not authenticated");
@@ -114,9 +114,9 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
         status: "Scheduled"
       };
 
-      console.log('Sending appointment data:', appointmentData);
+
       const response = await CustomerProfileService.createAppointment(appointmentData);
-      console.log('Appointment response:', response);
+
       
       if (response.isSuccess) {
         setShowConfirmation(true);
@@ -133,7 +133,7 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
         setSubmitError(response.message || "Failed to book appointment. Please try again.");
       }
     } catch (error) {
-      console.error('Appointment booking error:', error);
+
       setSubmitError(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
@@ -328,7 +328,7 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
                     <button
                       type="button"
                       onClick={() => {
-                        console.log('Date selected:', date);
+
                         setFormData(prev => ({ ...prev, date }));
                         if (errors.date) {
                           setErrors(prev => ({ ...prev, date: undefined }));
@@ -366,7 +366,7 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
                 key={slot}
                 type="button"
                 onClick={() => {
-                  console.log('Time slot selected:', slot);
+
                   setFormData(prev => ({ ...prev, time: slot }));
                   if (errors.time) {
                     setErrors(prev => ({ ...prev, time: undefined }));

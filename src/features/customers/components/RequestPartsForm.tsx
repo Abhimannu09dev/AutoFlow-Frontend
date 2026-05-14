@@ -43,7 +43,7 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch vehicles:', error);
+
       } finally {
         setVehiclesLoading(false);
       }
@@ -54,10 +54,10 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('RequestPartsForm handleSubmit called', { customerId, formData });
+
     
     if (!customerId || !formData.partIdentity) {
-      console.log('Validation failed:', { customerId, partIdentity: formData.partIdentity });
+
       return;
     }
 
@@ -65,15 +65,14 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
       setIsSubmitting(true);
       
       const requestData = {
-        customerId: customerId,
         partName: formData.partIdentity,
         quantity: formData.quantity,
         status: "Pending"
       };
 
-      console.log('Sending part request data:', requestData);
+
       const response = await CustomerProfileService.createPartRequest(requestData);
-      console.log('Part request response:', response);
+
       
       if (response.isSuccess) {
         setShowSuccess(true);
@@ -88,10 +87,10 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
           setShowSuccess(false);
         }, 5000);
       } else {
-        console.error('Failed to create part request:', response.message);
+
       }
     } catch (error) {
-      console.error('Error creating part request:', error);
+
     } finally {
       setIsSubmitting(false);
     }

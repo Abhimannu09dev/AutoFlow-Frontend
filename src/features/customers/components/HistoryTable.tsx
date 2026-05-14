@@ -64,7 +64,7 @@ export function HistoryTable() {
 
   // Handle view invoice
   const handleViewInvoice = (purchase: SaleResponse) => {
-    console.log('View invoice clicked:', purchase);
+
     setSelectedInvoice(purchase);
     setShowInvoiceModal(true);
   };

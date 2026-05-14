@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   LayoutGrid,
@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Shield,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useCustomerData } from "../../../../hooks/useCustomer";
@@ -64,8 +65,10 @@ function Field({
 
 export default function ProfilePage() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const router = useRouter();
   const { customer, isLoading, error, refetchData } = useCustomerData();
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Personal details state - initialize with backend data when available
   const [fullName, setFullName] = useState("");
@@ -81,7 +84,7 @@ export default function ProfilePage() {
       setEmail(customer.email || "");
       setPhone(customer.phone || "");
       setLocation(customer.address || "");
-      setBio("Passionate car enthusiast and technology professional. Always looking for the best performance parts for my collection.");
+      setBio("");
     }
   }, [customer]);
 
@@ -100,8 +103,13 @@ export default function ProfilePage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   const handleSave = async () => {
-    console.log('Profile save clicked', { fullName, email, phone, location, bio });
+
     
     try {
       setIsSaving(true);
@@ -121,10 +129,10 @@ export default function ProfilePage() {
         address: location
       });
 
-      console.log('Profile update response:', response);
+
 
       if (response.isSuccess) {
-        console.log('Profile updated successfully:', response.data);
+
         
         // Refresh customer data to show updated information
         await refetchData();
@@ -135,7 +143,7 @@ export default function ProfilePage() {
         setSaveError(response.message || 'Failed to save profile. Please try again.');
       }
     } catch (error) {
-      console.error('Error saving profile:', error);
+
       setSaveError('Failed to save profile. Please try again.');
     } finally {
       setIsSaving(false);
@@ -143,7 +151,7 @@ export default function ProfilePage() {
   };
 
   const handlePasswordChange = async () => {
-    console.log('Password change clicked');
+
     
     try {
       setPasswordError(null);
@@ -167,7 +175,7 @@ export default function ProfilePage() {
       // In a real implementation, this would call an API to change the password
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      console.log('Password change successful');
+
       
       // Clear password fields
       setCurrentPw("");
@@ -177,13 +185,13 @@ export default function ProfilePage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error changing password:', error);
+
       setPasswordError('Failed to change password. Please try again.');
     }
   };
 
   const handle2FAToggle = () => {
-    console.log('2FA toggle clicked', { currentState: twoFactorEnabled });
+
     setShow2FAModal(true);
   };
 
@@ -195,12 +203,12 @@ export default function ProfilePage() {
       setTwoFactorEnabled(!twoFactorEnabled);
       setShow2FAModal(false);
       
-      console.log('2FA toggled:', !twoFactorEnabled);
+
       
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error toggling 2FA:', error);
+
     }
   };
 
@@ -260,12 +268,22 @@ export default function ProfilePage() {
             })}
           </nav>
 
-          <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-[#e8eaf2] bg-[#f8f9fc] px-3 py-2.5">
-            <div className="size-8 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8]" />
-            <div className="min-w-0">
-              <p className="truncate text-[12px] font-semibold text-[#1e293b]">{user?.name || "User"}</p>
-              <p className="text-[10px] uppercase tracking-wide text-[#94a3b8]">{user?.role || "Member"}</p>
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center gap-2.5 rounded-xl border border-[#e8eaf2] bg-[#f8f9fc] px-3 py-2.5">
+              <div className="size-8 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8]" />
+              <div className="min-w-0">
+                <p className="truncate text-[12px] font-semibold text-[#1e293b]">{user?.name || "User"}</p>
+                <p className="text-[10px] uppercase tracking-wide text-[#94a3b8]">{user?.role || "Member"}</p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-[#64748b] hover:bg-[#fee2e2] hover:text-[#dc2626] transition"
+            >
+              <LogOut size={16} strokeWidth={1.8} aria-hidden="true" />
+              Logout
+            </button>
           </div>
         </aside>
 
@@ -290,14 +308,39 @@ export default function ProfilePage() {
                   <Bell size={19} aria-hidden="true" />
                   <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[#ef4444]" />
                 </button>
-                <div className="flex items-center gap-2">
-                  <div className="text-right leading-tight">
-                    <p className="text-[12px] font-semibold text-[#0f172a]">{user?.name || "User"}</p>
-                    <p className="text-[9px] font-semibold uppercase tracking-wide text-[#4338ca]">
-                      {user?.role || "Member"}
-                    </p>
-                  </div>
-                  <div className="size-8 rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8] ring-2 ring-white" />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="flex items-center gap-2 hover:opacity-80 transition"
+                  >
+                    <div className="text-right leading-tight">
+                      <p className="text-[12px] font-semibold text-[#0f172a]">{user?.name || "User"}</p>
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-[#4338ca]">
+                        {user?.role || "Member"}
+                      </p>
+                    </div>
+                    <div className="size-8 rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8] ring-2 ring-white" />
+                  </button>
+                  
+                  {showDropdown && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-10" 
+                        onClick={() => setShowDropdown(false)}
+                      />
+                      <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-[#e8eaf2] bg-white shadow-lg z-20">
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-[13px] font-medium text-[#64748b] hover:bg-[#f8f9fc] hover:text-[#dc2626] transition rounded-xl"
+                        >
+                          <LogOut size={16} aria-hidden="true" />
+                          Logout
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -499,16 +542,15 @@ export default function ProfilePage() {
                   <div className="mt-4">
                     <div className="flex items-center justify-between">
                       <span className="text-[12px] text-[#64748b]">Service credits</span>
-                      <span className="text-[12px] font-bold text-[#0f172a]">12 remaining</span>
+                      <span className="text-[12px] font-bold text-[#0f172a]">0 remaining</span>
                     </div>
                     <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#f1f3f8]">
-                      <div className="h-full w-[75%] rounded-full bg-[#059669]" />
+                      <div className="h-full w-[0%] rounded-full bg-[#059669]" />
                     </div>
                   </div>
 
                   <p className="mt-3 text-[11px] leading-relaxed text-[#64748b]">
-                    Next reward: 15% discount on performance brake kits after 2 more service
-                    bookings.
+                    Book services to earn credits and unlock exclusive rewards.
                   </p>
                 </div>
 

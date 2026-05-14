@@ -1,66 +1,39 @@
 import { NextResponse } from "next/server";
+import { getUserIdFromJwtAuthHeader } from "@/lib/getUserIdFromJwtAuthHeader";
 
-// In-memory storage for appointments (simulates database)
-const appointmentsStorage = new Map<string, any[]>();
-
-// Helper function to extract user info from JWT token
-function getUserFromToken(authHeader: string) {
+/** Backend requires `CustomerId` = `Customers.Id`, not the login user id. */
+async function customerIdExistsOnBackend(
+  backend: string,
+  authHeader: string,
+  customerId: string
+): Promise<boolean> {
   try {
-    const token = authHeader.replace('Bearer ', '');
-    return {
-      id: "019e08d8-c212-7e4b-91e1-f7f0297a527d",
-      name: "Sarah Johnson", 
-      email: "sarah.johnson@example.com",
-    };
-  } catch (error) {
-    return null;
+    const r = await fetch(`${backend}/api/predictions/${encodeURIComponent(customerId)}`, {
+      method: "GET",
+      headers: {
+        Authorization: authHeader,
+        Accept: "application/json",
+      },
+    });
+    return r.ok;
+  } catch {
+    return false;
   }
 }
 
-// Initialize with default appointments
-function getDefaultAppointments(userId: string) {
-  const today = new Date();
-  const futureDate1 = new Date(today);
-  futureDate1.setDate(today.getDate() + 7); // 7 days from now
-  const futureDate2 = new Date(today);
-  futureDate2.setDate(today.getDate() + 14); // 14 days from now
-  const pastDate = new Date(today);
-  pastDate.setDate(today.getDate() - 10); // 10 days ago
-  
-  return [
-    {
-      id: "appointment-1",
-      customerId: userId,
-      date: futureDate1.toISOString().split('T')[0],
-      time: "10:00:00",
-      status: "Scheduled",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "appointment-2",
-      customerId: userId,
-      date: futureDate2.toISOString().split('T')[0],
-      time: "14:30:00", 
-      status: "Scheduled",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    {
-      id: "appointment-3",
-      customerId: userId,
-      date: pastDate.toISOString().split('T')[0],
-      time: "09:00:00", 
-      status: "Completed",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  ];
+function normalizeTimeForApi(timeRaw: string): string {
+  const t = timeRaw.trim();
+  if (!t) return t;
+  const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(t);
+  if (!m) return t;
+  const h = m[1]!.padStart(2, "0");
+  const min = m[2]!.padStart(2, "0");
+  const sec = (m[3] ?? "00").padStart(2, "0");
+  return `${h}:${min}:${sec}`;
 }
 
 export async function GET(request: Request) {
   try {
-    // Get the current user from the token
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({
@@ -71,37 +44,29 @@ export async function GET(request: Request) {
       }, { status: 401 });
     }
 
-    const user = getUserFromToken(authHeader);
-    if (!user) {
-      return NextResponse.json({
-        isSuccess: false,
-        message: 'Invalid token',
-        data: [],
-        errorType: 'Unauthorized'
-      }, { status: 401 });
-    }
+    const backend = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5294";
 
-    // Get appointments from storage or use defaults
-    let appointments = appointmentsStorage.get(user.id);
-    if (!appointments) {
-      appointments = getDefaultAppointments(user.id);
-      appointmentsStorage.set(user.id, appointments);
-    }
-
-    console.log('GET Appointments - Returning:', appointments);
-    
-    return NextResponse.json({
-      isSuccess: true,
-      message: 'Customer appointments retrieved successfully',
-      data: appointments,
-      errorType: 'None'
+    const response = await fetch(`${backend}/api/appointments`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": authHeader
+      },
     });
 
+    const text = await response.text();
+    const contentType = response.headers.get("content-type") ?? "application/json";
+
+    return new NextResponse(text, {
+      status: response.status,
+      headers: { "content-type": contentType },
+    });
   } catch (error) {
-    console.error('Customer appointments API error:', error);
+    console.error('Appointments GET error:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
       isSuccess: false,
-      message: 'Failed to retrieve customer appointments',
+      message: `Server error: ${message}`,
       data: [],
       errorType: 'ServerError'
     }, { status: 500 });
@@ -120,65 +85,79 @@ export async function POST(request: Request) {
       }, { status: 401 });
     }
 
-    const user = getUserFromToken(authHeader);
-    if (!user) {
+    let body: Record<string, unknown>;
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
       return NextResponse.json({
         isSuccess: false,
-        message: 'Invalid token',
+        message: "Invalid JSON body",
         data: null,
-        errorType: 'Unauthorized'
-      }, { status: 401 });
-    }
-
-    const body = await request.json();
-    console.log('POST Appointment - Request:', body);
-
-    // Validate required fields
-    if (!body.date || !body.time) {
-      return NextResponse.json({
-        isSuccess: false,
-        message: 'Date and time are required',
-        data: null,
-        errorType: 'ValidationError'
+        errorType: "ValidationError",
       }, { status: 400 });
     }
 
-    // Get existing appointments or initialize
-    let appointments = appointmentsStorage.get(user.id);
-    if (!appointments) {
-      appointments = getDefaultAppointments(user.id);
+    const backend = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5294";
+
+    const rawCustomerId = String(body.customerId ?? body.CustomerId ?? "").trim();
+    if (!rawCustomerId) {
+      return NextResponse.json({
+        isSuccess: false,
+        message: "CustomerId is required.",
+        data: null,
+        errorType: "ValidationError",
+      }, { status: 400 });
     }
 
-    // Create new appointment
-    const newAppointment = {
-      id: `appointment-${Date.now()}`,
-      customerId: user.id,
-      date: body.date,
-      time: body.time,
-      status: body.status || "Scheduled",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    const exists = await customerIdExistsOnBackend(backend, authHeader, rawCustomerId);
+    if (!exists) {
+      const jwtUser = getUserIdFromJwtAuthHeader(authHeader);
+      const looksLikeLoginId =
+        jwtUser !== null && rawCustomerId.toLowerCase() === jwtUser.toLowerCase();
+      return NextResponse.json(
+        {
+          isSuccess: false,
+          message: looksLikeLoginId
+            ? "Appointments require your AutoFlow customer profile id (the Customers table id), not your login user id. Staff can see this id in the admin customer list, or the API needs to return it after login."
+            : "No customer record exists for the given CustomerId. Check the value and try again.",
+          data: null,
+          errorType: "ValidationError",
+        },
+        { status: 200 }
+      );
+    }
+
+    const timeRaw = String(body.time ?? body.Time ?? "").trim();
+
+    const forwardBody = {
+      customerId: rawCustomerId,
+      date: body.date ?? body.Date,
+      time: normalizeTimeForApi(timeRaw),
+      status: body.status ?? body.Status,
     };
 
-    // Add to appointments array
-    appointments.push(newAppointment);
-    appointmentsStorage.set(user.id, appointments);
-
-    console.log('POST Appointment - Created:', newAppointment);
-    console.log('POST Appointment - Total appointments:', appointments.length);
-    
-    return NextResponse.json({
-      isSuccess: true,
-      message: 'Appointment created successfully',
-      data: newAppointment,
-      errorType: 'None'
+    const response = await fetch(`${backend}/api/appointments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": authHeader
+      },
+      body: JSON.stringify(forwardBody),
     });
 
+    const text = await response.text();
+    const contentType = response.headers.get("content-type") ?? "application/json";
+
+    return new NextResponse(text, {
+      status: response.status,
+      headers: { "content-type": contentType },
+    });
   } catch (error) {
-    console.error('Create appointment API error:', error);
+    console.error('Appointments POST error:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
       isSuccess: false,
-      message: 'Failed to create appointment',
+      message: `Server error: ${message}`,
       data: null,
       errorType: 'ServerError'
     }, { status: 500 });

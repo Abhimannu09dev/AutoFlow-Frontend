@@ -122,7 +122,7 @@ export interface PartRequestResponse {
 
 // Review Types
 export interface CreateReviewRequest {
-  customerId: string;
+  customerId?: string;
   rating: number;
   comment?: string;
 }

@@ -24,10 +24,10 @@ export function ReviewForm({ customerId, existingReviews }: ReviewFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('ReviewForm handleSubmit called', { customerId, rating, feedback });
+
     
     if (!customerId) {
-      console.log('No customerId provided');
+
       return;
     }
 
@@ -35,22 +35,21 @@ export function ReviewForm({ customerId, existingReviews }: ReviewFormProps) {
       setIsSubmitting(true);
       
       const reviewData: CreateReviewRequest = {
-        customerId: customerId,
         rating: rating,
         comment: feedback || undefined
       };
 
-      console.log('Sending review data:', reviewData);
+
       const response = await CustomerProfileService.createReview(reviewData);
-      console.log('Review response:', response);
+
       
       if (response.isSuccess) {
         setShowThankYou(true);
       } else {
-        console.error('Failed to create review:', response.message);
+
       }
     } catch (error) {
-      console.error('Error creating review:', error);
+
     } finally {
       setIsSubmitting(false);
     }

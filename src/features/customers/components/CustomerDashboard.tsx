@@ -36,24 +36,6 @@ export default function CustomerDashboard() {
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
-  // Debug logging
-  console.log('Dashboard Calculations:', {
-    totalPurchases,
-    purchasesData: purchases.map(p => ({ 
-      id: p.id, 
-      amount: p.totalAmount, 
-      date: p.saleDate 
-    })),
-    upcomingAppointments,
-    appointmentsData: appointments.map(a => ({ 
-      id: a.id, 
-      date: a.date, 
-      status: a.status,
-      isPast: new Date(a.date) < today
-    })),
-    vehiclesCount: vehicles.length
-  });
-
   const stats = [
     { 
       label: "Total Purchases", 

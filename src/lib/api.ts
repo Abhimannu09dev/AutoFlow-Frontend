@@ -22,7 +22,6 @@ class ApiClient {
 
   private getAuthToken(): string | null {
     if (typeof window === 'undefined') {
-      console.log('ApiClient: Not in browser environment, no token available');
       return null;
     }
     
@@ -42,7 +41,6 @@ class ApiClient {
       }
     }
     
-    console.log('ApiClient: Retrieved token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
     return token;
   }
 
@@ -51,7 +49,6 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    console.log('ApiClient: Making request to:', url);
     
     const config: RequestInit = {
       headers: {
@@ -64,13 +61,10 @@ class ApiClient {
     // Add auth token if available
     const token = this.getAuthToken();
     if (token) {
-      console.log('ApiClient: Adding Authorization header with token');
       config.headers = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
       };
-    } else {
-      console.log('ApiClient: No token available, making unauthenticated request');
     }
 
     try {
@@ -86,11 +80,9 @@ class ApiClient {
           try {
             data = JSON.parse(text);
           } catch (parseError) {
-            console.error('JSON parse error:', parseError, 'Response text:', text);
             data = { error: 'Invalid JSON response', rawText: text };
           }
         } else {
-          console.error('Empty response body for JSON content-type');
           data = { error: 'Empty response body' };
         }
       } else {
@@ -139,8 +131,6 @@ class ApiClient {
       };
 
     } catch (error) {
-      console.error('API request failed:', error);
-      
       // If it's already an ApiError, re-throw it
       if (error && typeof error === 'object' && 'status' in error) {
         throw error;
@@ -148,7 +138,6 @@ class ApiClient {
       
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.error('Backend not available - network error');
         const networkError: ApiError = {
           message: 'Backend service is not available',
           status: 0,

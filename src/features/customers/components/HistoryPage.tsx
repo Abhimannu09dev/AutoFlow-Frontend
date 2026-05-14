@@ -28,7 +28,7 @@ export default function HistoryPage() {
 
   // Export to CSV function
   const handleExportCSV = () => {
-    console.log('Export CSV clicked');
+
     setIsExporting(true);
 
     try {
@@ -66,9 +66,9 @@ export default function HistoryPage() {
       link.click();
       document.body.removeChild(link);
       
-      console.log('CSV exported successfully');
+
     } catch (error) {
-      console.error('Error exporting CSV:', error);
+
     } finally {
       setIsExporting(false);
     }
@@ -76,13 +76,13 @@ export default function HistoryPage() {
 
   // Navigate to parts request page
   const handleNewRequest = () => {
-    console.log('New Request clicked');
+
     router.push('/customer/parts-request');
   };
 
   // Navigate to technical support (could be a contact page or modal)
   const handleTechSupport = () => {
-    console.log('Tech Support clicked');
+
     // For now, just log. In production, this could open a modal or navigate to support page
     alert('Technical support feature coming soon!');
   };

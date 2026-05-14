@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       headers: { "content-type": contentType },
     });
   } catch (error) {
-    console.error('Register API error:', error);
+
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
       IsSuccess: false,

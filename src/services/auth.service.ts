@@ -4,7 +4,7 @@ import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/api';
 export class AuthService {
   static async login(credentials: LoginRequest) {
     try {
-      console.log('AuthService: Making login request to /api/auth/login with:', credentials);
+
       
       // Make the API call to the Next.js API route
       const response = await fetch('/api/auth/login', {
@@ -13,15 +13,9 @@ export class AuthService {
         body: JSON.stringify(credentials),
       });
 
-      console.log('AuthService: Response status:', response.status);
-      console.log('AuthService: Response ok:', response.ok);
-      console.log('AuthService: Response headers:', Object.fromEntries(response.headers.entries()));
-
       const result = await response.json();
-      console.log('AuthService: Response data:', result);
 
       if (!response.ok || !(result?.IsSuccess || result?.isSuccess)) {
-        console.log('AuthService: Login failed - response not ok or IsSuccess/isSuccess false');
         return {
           isSuccess: false,
           message: result?.Message || result?.message || 'Login failed',
@@ -31,11 +25,9 @@ export class AuthService {
       }
 
       const userData = result.Data || result.data;
-      console.log('AuthService: User data extracted:', userData);
+
       
       if (userData && userData.token && typeof window !== 'undefined') {
-        console.log('AuthService: Storing token in localStorage:', userData.token);
-        
         // Store in both locations for compatibility
         localStorage.setItem('authToken', userData.token);
         localStorage.setItem('user', JSON.stringify(userData));
@@ -45,15 +37,6 @@ export class AuthService {
           token: userData.token,
           ...userData
         }));
-        
-        console.log('AuthService: Stored token and user data in localStorage');
-        console.log('AuthService: Verification - token from localStorage:', localStorage.getItem('authToken'));
-        console.log('AuthService: Verification - autoflow_auth from localStorage:', localStorage.getItem('autoflow_auth'));
-      } else {
-        console.log('AuthService: No token to store or not in browser environment');
-        console.log('AuthService: userData:', userData);
-        console.log('AuthService: userData.token:', userData?.token);
-        console.log('AuthService: typeof window:', typeof window);
       }
       
       return {
@@ -63,7 +46,7 @@ export class AuthService {
         errorType: 'None' as any
       };
     } catch (error) {
-      console.error('AuthService: Login error caught:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,

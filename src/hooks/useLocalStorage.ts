@@ -20,7 +20,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         window.localStorage.setItem(key, JSON.stringify(value));
       }
     } catch (err) {
-      console.error(`useLocalStorage error for key "${key}":`, err);
+
     }
   };
 
@@ -31,7 +31,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         window.localStorage.removeItem(key);
       }
     } catch (err) {
-      console.error(`useLocalStorage remove error for key "${key}":`, err);
+
     }
   };
 

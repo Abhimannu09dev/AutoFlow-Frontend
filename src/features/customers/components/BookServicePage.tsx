@@ -43,7 +43,7 @@ export default function BookServicePage() {
         </p>
       </div>
 
-      <BookingForm vehicles={vehicles} customerId={user?.id || ''} />
+      <BookingForm vehicles={vehicles} customerId={customer?.id || ""} />
     </DashboardLayout>
   );
 }

@@ -21,7 +21,7 @@ export function StarRating({
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleClick = (value: number) => {
-    console.log('StarRating clicked:', value, { readonly, onRatingChange });
+
     if (!readonly && onRatingChange) {
       onRatingChange(value);
     }

@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Customer search API error:', error);
+
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ 
       isSuccess: false, 

@@ -24,7 +24,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<CustomerResponseDto>('/api/customer/profile');
       return response;
     } catch (error) {
-      console.error('Customer profile API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -46,7 +46,7 @@ export class CustomerProfileService {
       const response = await apiClient.put<CustomerResponseDto>('/api/customer/profile', profileData);
       return response;
     } catch (error) {
-      console.error('Customer profile update API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -63,7 +63,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<VehicleResponseDto[]>('/api/customer/vehicles');
       return response;
     } catch (error) {
-      console.error('Customer vehicles API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -131,7 +131,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<SaleResponse[]>('/api/customer/purchases');
       return response;
     } catch (error) {
-      console.error('Customer purchases API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -148,7 +148,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<AppointmentResponse[]>('/api/customer/appointments');
       return response;
     } catch (error) {
-      console.error('Customer appointments API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -165,7 +165,7 @@ export class CustomerProfileService {
       const response = await apiClient.post<AppointmentResponse>('/api/customer/appointments', appointmentData);
       return response;
     } catch (error) {
-      console.error('Create appointment API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -182,7 +182,7 @@ export class CustomerProfileService {
       const response = await apiClient.post<PartRequestResponse>('/api/customer/parts-requests', partRequestData);
       return response;
     } catch (error) {
-      console.error('Create part request API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -199,7 +199,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<PartRequestResponse[]>('/api/customer/parts-requests');
       return response;
     } catch (error) {
-      console.error('Customer parts requests API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -216,7 +216,7 @@ export class CustomerProfileService {
       const response = await apiClient.post<ReviewResponse>('/api/customer/reviews', reviewData);
       return response;
     } catch (error) {
-      console.error('Create review API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,
@@ -233,7 +233,7 @@ export class CustomerProfileService {
       const response = await apiClient.get<ReviewResponse[]>('/api/customer/reviews');
       return response;
     } catch (error) {
-      console.error('Customer reviews API error:', error);
+
       const apiError = error as ApiError;
       return {
         isSuccess: false,

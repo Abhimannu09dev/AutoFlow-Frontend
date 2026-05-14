@@ -26,55 +26,45 @@ export function LoginForm() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log('LoginForm: handleSubmit called'); // Debug log
     e.preventDefault();
-    console.log('LoginForm: preventDefault called, about to start login process'); // Debug log
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      console.log('Attempting login with:', { email }); // Debug log
-      console.log('Login function:', typeof login); // Debug log
-      console.log('Login function exists:', !!login); // Debug log
-      
       if (!login) {
-        console.error('Login function is not available!');
+
         setErrorMessage("Authentication system error. Please refresh the page.");
         return;
       }
 
       // Test direct API call first
-      console.log('Testing direct API call...');
+
       try {
         const testResponse = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         });
-        console.log('Direct API test - Status:', testResponse.status);
-        console.log('Direct API test - OK:', testResponse.ok);
+
+
         const testResult = await testResponse.json();
-        console.log('Direct API test - Result:', testResult);
+
         
         // If direct API call works, the issue is in AuthService
         if (testResponse.ok && (testResult.IsSuccess || testResult.isSuccess)) {
-          console.log('Direct API call succeeded, issue is in AuthService.login');
+
         }
       } catch (testError) {
-        console.error('Direct API test failed:', testError);
+
       }
       
       const success = await login(email, password);
-      
-      console.log('Login result:', success); // Debug log
       
       if (success) {
         // Store in localStorage if remember is checked
         if (remember && typeof window !== 'undefined') {
           localStorage.setItem("autoflow_remember", "true");
         }
-        
-        console.log('Login successful, redirecting to dashboard...'); // Debug log
         
         // Wait a moment for the user state to be set, then redirect based on role
         setTimeout(() => {
@@ -91,7 +81,6 @@ export function LoginForm() {
         setErrorMessage("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      console.error('Login form error:', error); // Debug log
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(
         message.includes("Failed to fetch")
@@ -230,7 +219,6 @@ export function LoginForm() {
                 type="submit"
                 disabled={isLoading}
                 suppressHydrationWarning
-                onClick={() => console.log('Login button clicked!')}
                 className="mt-2 w-full rounded-xl bg-gradient-to-r from-[#3f2fd8] to-[#5d56f0] px-4 py-3.5 text-base font-semibold text-white shadow-[0_8px_18px_rgba(63,47,216,0.28)] transition hover:brightness-105 disabled:opacity-60"
               >
                 {isLoading ? "Logging in…" : "Login"}

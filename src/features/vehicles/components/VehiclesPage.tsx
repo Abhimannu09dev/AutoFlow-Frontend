@@ -73,7 +73,7 @@ function VehicleCard({ vehicle, onEdit, onDelete, onViewSpecs }: {
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_6px_rgba(15,23,42,0.08)] ring-1 ring-black/[0.04]">
       <div className="relative h-44 w-full overflow-hidden bg-[#1a1a2e]">
-        <Image src="/car-bg.svg" alt={`${vehicle.brand} ${vehicle.model}`} fill className="object-cover object-center" />
+        <Image src="/car-bg.svg" alt={`${vehicle.brand} ${vehicle.model}`} fill className="object-cover object-center" priority />
         <StatusBadge status="Active" />
       </div>
       <div className="flex flex-1 flex-col p-4">
@@ -189,7 +189,7 @@ export default function VehiclesPage() {
 
   // Handlers
   const handleAddVehicle = () => {
-    console.log('Add vehicle clicked');
+
     setFormData({
       brand: "",
       model: "",
@@ -202,7 +202,7 @@ export default function VehiclesPage() {
   };
 
   const handleEditVehicle = (vehicle: VehicleResponseDto) => {
-    console.log('Edit vehicle clicked:', vehicle);
+
     setSelectedVehicle(vehicle);
     setFormData({
       brand: vehicle.brand,
@@ -216,13 +216,13 @@ export default function VehiclesPage() {
   };
 
   const handleDeleteVehicle = (vehicle: VehicleResponseDto) => {
-    console.log('Delete vehicle clicked:', vehicle);
+
     setSelectedVehicle(vehicle);
     setShowDeleteModal(true);
   };
 
   const handleSaveVehicle = async () => {
-    console.log('Save vehicle clicked', formData);
+
     
     // Validate required fields
     if (!formData.brand || !formData.model || !formData.year) {
@@ -246,15 +246,15 @@ export default function VehiclesPage() {
       let response;
       if (showEditModal && selectedVehicle) {
         // Update existing vehicle
-        console.log('Updating vehicle:', selectedVehicle.id, vehicleData);
+
         response = await CustomerProfileService.updateVehicle(selectedVehicle.id, vehicleData);
       } else {
         // Add new vehicle
-        console.log('Adding new vehicle:', vehicleData);
+
         response = await CustomerProfileService.addVehicle(vehicleData);
       }
 
-      console.log('Vehicle save response:', response);
+
 
       if (response.isSuccess) {
         showNotification('success', showEditModal ? 'Vehicle updated successfully' : 'Vehicle added successfully');
@@ -267,7 +267,7 @@ export default function VehiclesPage() {
         showNotification('error', response.message || 'Failed to save vehicle');
       }
     } catch (error) {
-      console.error('Error saving vehicle:', error);
+
       showNotification('error', 'An error occurred while saving the vehicle');
     } finally {
       setIsSaving(false);
@@ -277,12 +277,12 @@ export default function VehiclesPage() {
   const confirmDelete = async () => {
     if (!selectedVehicle) return;
     
-    console.log('Confirming delete for vehicle:', selectedVehicle);
+
     setIsSaving(true);
     
     try {
       const response = await CustomerProfileService.deleteVehicle(selectedVehicle.id);
-      console.log('Delete vehicle response:', response);
+
 
       if (response.isSuccess) {
         showNotification('success', 'Vehicle deleted successfully');
@@ -294,7 +294,7 @@ export default function VehiclesPage() {
         showNotification('error', response.message || 'Failed to delete vehicle');
       }
     } catch (error) {
-      console.error('Error deleting vehicle:', error);
+
       showNotification('error', 'An error occurred while deleting the vehicle');
     } finally {
       setIsSaving(false);
@@ -302,20 +302,20 @@ export default function VehiclesPage() {
   };
 
   const handleViewSpecs = (vehicle: VehicleResponseDto) => {
-    console.log('View specs clicked:', vehicle);
+
     setSelectedVehicle(vehicle);
     setShowSpecsModal(true);
   };
 
   const handleAddToCart = (part: typeof recommendedParts[0]) => {
-    console.log('Add to cart clicked:', part);
+
     setAddedPart(part.name);
     setShowCartNotification(true);
     setTimeout(() => setShowCartNotification(false), 3000);
   };
 
   const handleBrowseCatalog = () => {
-    console.log('Browse catalog clicked');
+
     // In production, this would navigate to the parts catalog
   };
 

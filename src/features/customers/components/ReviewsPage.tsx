@@ -24,7 +24,7 @@ export default function ReviewsPage() {
           setReviews(response.data);
         }
       } catch (error) {
-        console.error('Failed to fetch reviews:', error);
+
       } finally {
         setReviewsLoading(false);
       }

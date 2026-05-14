@@ -90,7 +90,7 @@ export function useCustomerData() {
               setAppointments(servicesResponse.data);
             }
           } catch (apiError) {
-            console.warn('API calls failed for admin/staff user, using fallback data');
+
             // Even for admin/staff, provide fallback if API fails
             const fallbackCustomer: CustomerResponseDto = {
               id: user.id,
@@ -106,7 +106,7 @@ export function useCustomerData() {
         }
 
       } catch (err) {
-        console.error('Customer data fetch error:', err);
+
         setError(err instanceof Error ? err.message : 'Failed to fetch customer data');
         
         // Always provide fallback data even on error

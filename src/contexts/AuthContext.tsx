@@ -53,20 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log('AuthContext: login function called with email:', email); // Debug log
     try {
       setIsLoading(true);
-      console.log('AuthContext: About to call AuthService.login'); // Debug log
-      console.log('AuthService exists:', !!AuthService); // Debug log
-      console.log('AuthService.login exists:', !!AuthService.login); // Debug log
-      
       const response = await AuthService.login({ email, password });
       
-      console.log('AuthContext: Login response received:', response); // Debug log
-      
       if (response.isSuccess) {
-        console.log('AuthContext: Login successful, user data:', response.data); // Debug log
-        
         const authUser: AuthUser = {
           id: response.data.userId,
           name: response.data.fullName,
@@ -76,15 +67,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           token: response.data.token,
         };
         
-        console.log('AuthContext: Setting auth user:', authUser); // Debug log
         setUser(authUser);
         return true;
       }
       
-      console.log('AuthContext: Login failed:', response.message); // Debug log
       return false;
     } catch (error) {
-      console.error('AuthContext: Login error:', error);
+
       return false;
     } finally {
       setIsLoading(false);
@@ -118,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       return false;
     } catch (error) {
-      console.error('Registration error:', error);
+
       return false;
     } finally {
       setIsLoading(false);
