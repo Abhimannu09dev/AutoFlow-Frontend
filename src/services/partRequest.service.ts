@@ -11,7 +11,7 @@ export class PartRequestService {
         isSuccess: false,
         message: apiError.message,
         data: {} as PartRequestResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -25,7 +25,7 @@ export class PartRequestService {
         isSuccess: false,
         message: apiError.message,
         data: [] as PartRequestResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }

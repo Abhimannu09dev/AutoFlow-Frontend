@@ -1,118 +1,105 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  Bell,
-  Box,
-  ClipboardList,
+  BarChart3,
+  Boxes,
   FileText,
-  PlusCircle,
-  Truck,
+  LayoutGrid,
+  LogOut,
+  MessageSquare,
+  ReceiptText,
+  Settings,
   Users,
-  X,
+  Wrench,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { useAuth } from "@/contexts/AuthContext";
 import { ROUTES } from "@/config/routes";
 
 interface AdminNavItem {
-  key: string;
   label: string;
   href: string;
   icon: LucideIcon;
 }
 
-interface AdminNavProps {
+interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AdminNav({ isOpen, onClose }: AdminNavProps) {
-  const pathname = usePathname();
+const items: AdminNavItem[] = [
+  { label: "Dashboard", href: ROUTES.admin.dashboard, icon: LayoutGrid },
+  { label: "Staff", href: ROUTES.admin.users, icon: Users },
+  { label: "Vendors", href: ROUTES.admin.vendors, icon: Users },
+  { label: "Inventory", href: ROUTES.staff.parts, icon: Boxes },
+  { label: "Part Request", href: ROUTES.admin.partRequests, icon: Wrench },
+  { label: "Purchase Invoices", href: ROUTES.admin.purchaseInvoices, icon: ReceiptText },
+  { label: "Reports", href: ROUTES.admin.financialReports, icon: BarChart3 },
+  { label: "Reviews", href: ROUTES.admin.reviews, icon: MessageSquare },
+  { label: "Settings", href: ROUTES.admin.settings, icon: Settings },
+  { label: "Analytics", href: ROUTES.admin.analytics, icon: FileText },
+];
 
-  const items: AdminNavItem[] = [
-    { key: "dashboard", label: "Dashboard", href: ROUTES.admin.dashboard, icon: Box },
-    { key: "staff", label: "Staff Management", href: ROUTES.admin.users, icon: Users },
-    { key: "vendor", label: "Vendor Management", href: "/staff/vendor", icon: Truck },
-    {
-      key: "parts",
-      label: "Vehicle Parts Management",
-      href: "/staff/parts",
-      icon: ClipboardList,
-    },
-    {
-      key: "invoices",
-      label: "Purchase Invoice Management",
-      href: ROUTES.admin.purchaseInvoices,
-      icon: FileText,
-    },
-    {
-      key: "reports",
-      label: "Financial Reports",
-      href: "/admin/financial-reports",
-      icon: FileText,
-    },
-    { key: "notifications", label: "Notifications", href: "/staff/notifications", icon: Bell },
-  ];
+export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+    router.replace("/login");
+  };
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col justify-between border-r border-[rgba(226,232,240,0.7)] bg-[#f8fafc] px-4 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-transform duration-300 lg:shadow-none ${
-        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col justify-between bg-[#091426] px-4 py-6 transition-transform duration-300 lg:translate-x-0 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       <div>
-        <div className="mb-8 flex items-start justify-between px-2 pt-1">
+        <div className="mb-8 flex items-center gap-3 px-2">
+          <span className="inline-flex size-10 items-center justify-center rounded-lg bg-white text-[#091426]">
+            <LayoutGrid className="size-4" />
+          </span>
           <div>
-            <h3 className="text-xl font-bold tracking-[-0.02em] text-[#4338ca]">AutoFlow</h3>
-            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-[#6b7280]">
-              Admin Console
-            </p>
+            <h2 className="text-2xl font-semibold text-white">AutoFlow</h2>
+            <p className="text-xs font-semibold tracking-wide text-[#bcc7de]">Admin Portal</p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 text-[#64748b] transition hover:bg-[#eef2ff] hover:text-[#4338ca] lg:hidden"
-            aria-label="Close sidebar menu"
-          >
-            <X className="size-4" />
-          </button>
         </div>
 
-        <nav className="space-y-1 overflow-y-auto pr-1">
-          {items.map((it) => {
-            const Icon = it.icon;
-            const isActive = pathname === it.href;
-            const isMultiLine = it.label.includes("Management");
-
+        <nav className="space-y-1">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
             return (
               <Link
-                key={it.key}
-                href={it.href}
+                key={item.href}
+                href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                  isActive
-                    ? "bg-[rgba(224,231,255,0.5)] text-[#4338ca]"
-                    : "text-[#64748b] hover:bg-[#eef2ff] hover:text-[#4338ca]"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                  active ? "bg-[#13233d] text-white" : "text-[#8590a6] hover:bg-[#0f1f38] hover:text-white"
                 }`}
               >
-                <Icon className="size-[18px] shrink-0" aria-hidden="true" />
-                <span className={isMultiLine ? "leading-5" : ""}>{it.label}</span>
+                <Icon className="size-4 shrink-0" />
+                {item.label}
               </Link>
             );
           })}
         </nav>
       </div>
 
-      <Link
-        href="/staff/repair-orders"
-        onClick={onClose}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3525cd] to-[#4f46e5] px-4 py-3 text-sm font-bold text-white shadow-[0_10px_15px_-3px_rgba(53,37,205,0.2)]"
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-[#bcc7de] hover:bg-[#0f1f38] hover:text-white"
       >
-        <PlusCircle className="size-4" aria-hidden="true" />
-        New Service Order
-      </Link>
+        <LogOut className="size-4" />
+        Logout
+      </button>
     </aside>
   );
 }

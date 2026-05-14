@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { MapPin, Heart } from "lucide-react";
 import { CustomerProfileService } from "../../../services/customerProfile.service";
@@ -16,6 +17,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ customerId, existingReviews }: ReviewFormProps) {
+  const existingReviewCount = existingReviews.length;
   const [rating, setRating] = useState(5);
   const [feedback, setFeedback] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -113,6 +115,7 @@ export function ReviewForm({ customerId, existingReviews }: ReviewFormProps) {
             <Button
               type="submit"
               disabled={isSubmitting}
+              aria-label={existingReviewCount > 0 ? "Submit another review" : "Submit first review"}
               className="px-8"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Review'}
@@ -147,9 +150,11 @@ export function ReviewForm({ customerId, existingReviews }: ReviewFormProps) {
 
         {/* Car Image Card */}
         <div className="rounded-2xl overflow-hidden">
-          <img 
-            src="/car-bg.svg" 
+          <Image
+            src="/car-bg.svg"
             alt="Porsche 911 GT3"
+            width={1200}
+            height={320}
             className="w-full h-32 object-cover"
           />
         </div>

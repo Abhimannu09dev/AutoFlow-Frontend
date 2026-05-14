@@ -1,7 +1,7 @@
 "use client";
 
 import { Eye, EyeOff, LockKeyhole, Mail, Zap } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -14,16 +14,10 @@ export function LoginForm() {
   const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
   const footerLinks = ["Privacy Policy", "Terms of Service", "System Status"];
-
-  // Ensure component only renders on client side to avoid hydration issues
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log('LoginForm: handleSubmit called'); // Debug log
@@ -102,34 +96,6 @@ export function LoginForm() {
       setIsLoading(false);
     }
   };
-
-  // Show loading state until component is mounted on client
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen bg-[#f3f5fb] px-4 py-8 text-slate-700">
-        <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[920px] flex-col items-center justify-center gap-4">
-          <main className="flex w-full justify-center py-20">
-            <section className="w-full max-w-[410px] rounded-2xl bg-white px-6 pb-8 pt-7 shadow-[0_18px_40px_rgba(85,93,128,0.12)] ring-1 ring-black/5 sm:px-7">
-              <div className="flex flex-col items-center text-center">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-[#efeefe] text-[#4f46e5] shadow-[0_2px_6px_rgba(79,70,229,0.08)]">
-                  <Zap size={22} strokeWidth={2.4} aria-hidden="true" />
-                </div>
-                <h1 className="mt-4 text-[28px] font-semibold leading-none tracking-tight text-slate-800">
-                  AutoFlow
-                </h1>
-                <p className="mt-2 text-[13px] font-medium text-slate-500">
-                  Precision Management Portal
-                </p>
-              </div>
-              <div className="mt-8 flex items-center justify-center">
-                <div className="text-slate-500">Loading...</div>
-              </div>
-            </section>
-          </main>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f3f5fb] px-4 py-8 text-slate-700">

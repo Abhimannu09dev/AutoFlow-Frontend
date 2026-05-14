@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { User } from "lucide-react";
 
 interface ServiceCardProps {
@@ -53,9 +54,11 @@ export function ServiceCard({
       {/* Service Image */}
       {image && (
         <div className="rounded-xl overflow-hidden">
-          <img 
-            src={image} 
+          <Image
+            src={image}
             alt={title}
+            width={1200}
+            height={192}
             className="w-full h-24 object-cover"
           />
         </div>

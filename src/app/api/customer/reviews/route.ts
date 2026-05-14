@@ -1,18 +1,29 @@
 import { NextResponse } from "next/server";
 
+interface ReviewRecord {
+  id: string;
+  customerId: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // In-memory storage for reviews (simulates database)
-const reviewsStorage = new Map<string, any[]>();
+const reviewsStorage = new Map<string, ReviewRecord[]>();
 
 // Helper function to extract user info from JWT token
 function getUserFromToken(authHeader: string) {
   try {
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     return {
       id: "019e08d8-c212-7e4b-91e1-f7f0297a527d",
       name: "Sarah Johnson", 
       email: "sarah.johnson@example.com",
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

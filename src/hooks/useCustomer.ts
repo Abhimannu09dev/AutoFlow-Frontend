@@ -15,12 +15,11 @@ export function useCustomerData() {
   const [vehicles, setVehicles] = useState<VehicleResponseDto[]>([]);
   const [purchases, setPurchases] = useState<SaleResponse[]>([]);
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => Boolean(user?.id));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) {
-      setIsLoading(false);
       return;
     }
 
@@ -89,7 +88,7 @@ export function useCustomerData() {
             if (servicesResponse.isSuccess) {
               setAppointments(servicesResponse.data);
             }
-          } catch (apiError) {
+          } catch {
             console.warn('API calls failed for admin/staff user, using fallback data');
             // Even for admin/staff, provide fallback if API fails
             const fallbackCustomer: CustomerResponseDto = {

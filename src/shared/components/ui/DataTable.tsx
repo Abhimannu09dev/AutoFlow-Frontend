@@ -11,8 +11,8 @@ interface Column {
 
 interface DataTableProps {
   columns: Column[];
-  data: Record<string, any>[];
-  renderCell?: (key: string, value: any, row: Record<string, any>) => ReactNode;
+  data: object[];
+  renderCell?: (key: string, value: unknown, row: object) => ReactNode;
   className?: string;
 }
 
@@ -38,17 +38,22 @@ export function DataTable({ columns, data, renderCell, className = "" }: DataTab
       <div className="divide-y divide-[#f1f5f9]">
         {data.map((row, index) => (
           <div key={index} className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#f8f9fc] transition-colors">
-            {columns.map((column) => (
-              <div
-                key={column.key}
-                className={`text-[13px] ${
-                  column.align === "center" ? "text-center" : 
-                  column.align === "right" ? "text-right" : "text-left"
-                } ${column.width || "col-span-2"}`}
-              >
-                {renderCell ? renderCell(column.key, row[column.key], row) : row[column.key]}
-              </div>
-            ))}
+            {columns.map((column) => {
+              const rowData = row as Record<string, unknown>;
+              const value = rowData[column.key];
+
+              return (
+                <div
+                  key={column.key}
+                  className={`text-[13px] ${
+                    column.align === "center" ? "text-center" : 
+                    column.align === "right" ? "text-right" : "text-left"
+                  } ${column.width || "col-span-2"}`}
+                >
+                  {renderCell ? renderCell(column.key, value, row) : String(value ?? "")}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

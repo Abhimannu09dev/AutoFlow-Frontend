@@ -203,7 +203,7 @@ export default function HistoryPage() {
               <div>
                 <h3 className="text-[18px] font-bold text-[#0f172a] mb-2">Loyalty Points</h3>
                 <p className="text-[13px] text-[#64748b] leading-relaxed">
-                  You've earned {loyaltyPoints} points on your previous purchases. 
+                  You&apos;ve earned {loyaltyPoints} points on your previous purchases. 
                   Redeem them for discounts!
                 </p>
               </div>

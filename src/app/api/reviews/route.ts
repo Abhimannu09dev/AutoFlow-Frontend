@@ -1,18 +1,10 @@
-import { NextResponse } from "next/server";
+import { proxyGet, proxyRequest } from "@/services/proxy";
+import { apiRoutes } from "@/config/app.config";
 
-const backend = () =>
-  process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+export async function GET(request: Request) {
+  return proxyGet(apiRoutes.reviews, request);
+}
 
-export async function GET() {
-  try {
-    const res = await fetch(`${backend()}/api/reviews`);
-    const text = await res.text();
-    return new NextResponse(text, {
-      status: res.status,
-      headers: { "content-type": res.headers.get("content-type") ?? "application/json" },
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ message }, { status: 502 });
-  }
+export async function POST(request: Request) {
+  return proxyRequest(request, apiRoutes.reviews);
 }

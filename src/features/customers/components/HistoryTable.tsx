@@ -18,6 +18,8 @@ interface HistoryTableData {
   originalData: SaleResponse;
 }
 
+type BadgeStatus = "completed" | "pending" | "cancelled" | "processing";
+
 const columns = [
   { key: "invoiceId", label: "INVOICE ID", width: "col-span-2" },
   { key: "date", label: "DATE", width: "col-span-2" },
@@ -133,24 +135,32 @@ export function HistoryTable() {
     );
   }
 
-  const renderCell = (key: string, value: any, row: Record<string, any>) => {
+  const toBadgeStatus = (status: string): BadgeStatus => {
+    const normalized = status.toLowerCase();
+    if (normalized === "completed" || normalized === "pending" || normalized === "cancelled" || normalized === "processing") {
+      return normalized;
+    }
+    return "processing";
+  };
+
+  const renderCell = (key: string, value: unknown, row: object) => {
     const typedRow = row as HistoryTableData;
     
     switch (key) {
       case "invoiceId":
         return (
           <div>
-            <p className="font-semibold text-[#0f172a]">{value}</p>
+            <p className="font-semibold text-[#0f172a]">{String(value ?? "")}</p>
           </div>
         );
       case "date":
-        return <span className="text-[#64748b]">{value}</span>;
+        return <span className="text-[#64748b]">{String(value ?? "")}</span>;
       case "items":
-        return <span className="text-[#0f172a]">{value}</span>;
+        return <span className="text-[#0f172a]">{String(value ?? "")}</span>;
       case "totalAmount":
-        return <span className="font-semibold text-[#0f172a]">{value}</span>;
+        return <span className="font-semibold text-[#0f172a]">{String(value ?? "")}</span>;
       case "status":
-        return <StatusBadge status={value} />;
+        return <StatusBadge status={toBadgeStatus(String(value ?? ""))} />;
       case "action":
         return (
           <button 
@@ -162,7 +172,7 @@ export function HistoryTable() {
           </button>
         );
       default:
-        return value;
+        return String(value ?? "");
     }
   };
 
@@ -209,7 +219,7 @@ export function HistoryTable() {
                     <p className="text-[12px] font-semibold text-[#64748b] uppercase tracking-wide">Invoice ID</p>
                     <p className="text-[16px] font-bold text-[#0f172a]">INV-{selectedInvoice.id.substring(0, 8)}</p>
                   </div>
-                  <StatusBadge status={selectedInvoice.status.toLowerCase() as any} />
+                  <StatusBadge status={toBadgeStatus(selectedInvoice.status)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>

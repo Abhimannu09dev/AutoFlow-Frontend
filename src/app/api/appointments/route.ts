@@ -5,6 +5,7 @@ export async function POST(request: Request) {
   return proxyRequest(request, apiRoutes.appointments);
 }
 
-export async function GET() {
-  return proxyGet(apiRoutes.appointments);
+export async function GET(request: Request) {
+  const { search } = new URL(request.url);
+  return proxyGet(`${apiRoutes.appointments}${search}`, request);
 }

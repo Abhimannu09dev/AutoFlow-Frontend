@@ -1,13 +1,25 @@
 import { NextResponse } from "next/server";
 
+interface ProfileRecord {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  createdAt: string;
+  applicationUserId: string;
+}
+
 // In-memory storage for profile updates (simulates database)
 // In production, this would be replaced with actual database calls
-const profileStorage = new Map<string, any>();
+const profileStorage = new Map<string, ProfileRecord>();
 
 // Helper function to extract user info from JWT token
 function getUserFromToken(authHeader: string) {
   try {
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     
     // In production, you would decode and validate the JWT token
     return {
@@ -15,7 +27,7 @@ function getUserFromToken(authHeader: string) {
       name: "Sarah Johnson",
       email: "sarah.johnson@example.com",
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
