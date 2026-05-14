@@ -1,7 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { AuthService } from '../services/auth.service';
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import { createContext, useContext, useEffect, useState } from "react";
+
+import { AuthService } from "../services/auth.service";
 
 interface AuthUser {
   id: string;
@@ -15,110 +18,102 @@ interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: { fullName: string; email: string; password: string; address?: string; phone?: string }) => Promise<boolean>;
+  register: (userData: {
+    fullName: string;
+    email: string;
+    password: string;
+    address?: string;
+    phone?: string;
+  }) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
+
+type AuthPayload = {
+  userId?: string;
+  fullName?: string;
+  email?: string;
+  token?: string;
+  roles?: string[];
+};
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   isLoading: true,
   login: async () => false,
   register: async () => false,
-  logout: () => {},
+  logout: () => undefined,
   isAuthenticated: false,
 });
+
+function resolveRole(roles: string[] | undefined): "customer" | "staff" | "admin" {
+  if ((roles ?? []).includes("Customer")) return "customer";
+  if ((roles ?? []).includes("Admin")) return "admin";
+  return "staff";
+}
+
+function toAuthUser(payload: AuthPayload | null): AuthUser | null {
+  if (!payload?.userId || !payload?.fullName || !payload?.email || !payload?.token) {
+    return null;
+  }
+
+  return {
+    id: payload.userId,
+    name: payload.fullName,
+    email: payload.email,
+    role: resolveRole(payload.roles),
+    token: payload.token,
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on app start
-    const currentUser = AuthService.getCurrentUser();
-    
-    if (currentUser) {
-      const authUser: AuthUser = {
-        id: currentUser.userId,
-        name: currentUser.fullName,
-        email: currentUser.email,
-        role: currentUser.roles.includes('Customer') ? 'customer' : 
-              currentUser.roles.includes('Admin') ? 'admin' : 'staff',
-        token: currentUser.token,
-      };
-      setUser(authUser);
-    }
-    
+    const currentUser = AuthService.getCurrentUser() as AuthPayload | null;
+    setUser(toAuthUser(currentUser));
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log('AuthContext: login function called with email:', email); // Debug log
     try {
       setIsLoading(true);
-      console.log('AuthContext: About to call AuthService.login'); // Debug log
-      console.log('AuthService exists:', !!AuthService); // Debug log
-      console.log('AuthService.login exists:', !!AuthService.login); // Debug log
-      
       const response = await AuthService.login({ email, password });
-      
-      console.log('AuthContext: Login response received:', response); // Debug log
-      
+
       if (response.isSuccess) {
-        console.log('AuthContext: Login successful, user data:', response.data); // Debug log
-        
-        const authUser: AuthUser = {
-          id: response.data.userId,
-          name: response.data.fullName,
-          email: response.data.email,
-          role: response.data.roles.includes('Customer') ? 'customer' : 
-                response.data.roles.includes('Admin') ? 'admin' : 'staff',
-          token: response.data.token,
-        };
-        
-        console.log('AuthContext: Setting auth user:', authUser); // Debug log
-        setUser(authUser);
-        return true;
+        const mapped = toAuthUser(response.data as AuthPayload);
+        setUser(mapped);
+        return mapped !== null;
       }
-      
-      console.log('AuthContext: Login failed:', response.message); // Debug log
+
       return false;
-    } catch (error) {
-      console.error('AuthContext: Login error:', error);
+    } catch {
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (userData: { 
-    fullName: string; 
-    email: string; 
-    password: string; 
-    address?: string; 
-    phone?: string 
+  const register = async (userData: {
+    fullName: string;
+    email: string;
+    password: string;
+    address?: string;
+    phone?: string;
   }): Promise<boolean> => {
     try {
       setIsLoading(true);
       const response = await AuthService.register(userData);
-      
+
       if (response.isSuccess) {
-        const authUser: AuthUser = {
-          id: response.data.userId,
-          name: response.data.fullName,
-          email: response.data.email,
-          role: response.data.roles.includes('Customer') ? 'customer' : 
-                response.data.roles.includes('Admin') ? 'admin' : 'staff',
-          token: response.data.token,
-        };
-        
-        setUser(authUser);
-        return true;
+        const mapped = toAuthUser(response.data as AuthPayload);
+        setUser(mapped);
+        return mapped !== null;
       }
-      
+
       return false;
-    } catch (error) {
-      console.error('Registration error:', error);
+    } catch {
       return false;
     } finally {
       setIsLoading(false);
@@ -139,11 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

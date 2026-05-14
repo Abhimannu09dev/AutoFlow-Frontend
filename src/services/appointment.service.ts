@@ -11,7 +11,7 @@ export class AppointmentService {
         isSuccess: false,
         message: apiError.message,
         data: {} as AppointmentResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -25,7 +25,7 @@ export class AppointmentService {
         isSuccess: false,
         message: apiError.message,
         data: [] as AppointmentResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -39,7 +39,7 @@ export class AppointmentService {
         isSuccess: false,
         message: apiError.message,
         data: {} as AppointmentResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }

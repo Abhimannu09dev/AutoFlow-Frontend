@@ -1,27 +1,24 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CustomerService } from '../../services/customer.service';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   VehicleResponseDto, 
   AppointmentResponse, 
   SaleResponse, 
-  PartRequestResponse,
-  ReviewResponse,
   CustomerResponseDto
 } from '../../types/api';
 
 // Generic hook for API calls
 export function useApiCall<T>(
-  apiCall: () => Promise<{ isSuccess: boolean; data: T }>,
-  dependencies: any[] = []
+  apiCall: () => Promise<{ isSuccess: boolean; data: T }>
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -37,11 +34,11 @@ export function useApiCall<T>(
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiCall]);
 
   useEffect(() => {
-    fetchData();
-  }, dependencies);
+    void Promise.resolve().then(fetchData);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 }
@@ -49,39 +46,47 @@ export function useApiCall<T>(
 // Customer Vehicles Hook
 export function useCustomerVehicles() {
   const { user } = useAuth();
-  
-  return useApiCall<VehicleResponseDto[]>(
-    () => CustomerService.getCustomerVehicles(user?.id || ''),
-    [user?.id]
+  const customerId = user?.id ?? '';
+  const loadCustomerVehicles = useCallback(
+    () => CustomerService.getCustomerVehicles(customerId),
+    [customerId]
   );
+  
+  return useApiCall<VehicleResponseDto[]>(loadCustomerVehicles);
 }
 
 // Customer Services Hook
 export function useCustomerServices() {
   const { user } = useAuth();
-  
-  return useApiCall<AppointmentResponse[]>(
-    () => CustomerService.getCustomerServices(user?.id || ''),
-    [user?.id]
+  const customerId = user?.id ?? '';
+  const loadCustomerServices = useCallback(
+    () => CustomerService.getCustomerServices(customerId),
+    [customerId]
   );
+  
+  return useApiCall<AppointmentResponse[]>(loadCustomerServices);
 }
 
 // Customer Purchases Hook
 export function useCustomerPurchases() {
   const { user } = useAuth();
-  
-  return useApiCall<SaleResponse[]>(
-    () => CustomerService.getCustomerPurchases(user?.id || ''),
-    [user?.id]
+  const customerId = user?.id ?? '';
+  const loadCustomerPurchases = useCallback(
+    () => CustomerService.getCustomerPurchases(customerId),
+    [customerId]
   );
+  
+  return useApiCall<SaleResponse[]>(loadCustomerPurchases);
 }
 
 // Customer Profile Hook
 export function useCustomerProfile() {
   const { user } = useAuth();
-  
-  return useApiCall<CustomerResponseDto>(
-    () => CustomerService.getCustomerById(user?.id || ''),
-    [user?.id]
+  const customerId = user?.id ?? '';
+  const loadCustomerProfile = useCallback(
+    () => CustomerService.getCustomerById(customerId),
+    [customerId]
   );
+  
+  return useApiCall<CustomerResponseDto>(loadCustomerProfile);
 }

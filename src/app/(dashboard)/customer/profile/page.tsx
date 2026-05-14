@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LayoutGrid,
   User,
@@ -67,23 +67,21 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const { customer, isLoading, error, refetchData } = useCustomerData();
 
-  // Personal details state - initialize with backend data when available
+  const defaultBio =
+    "Passionate car enthusiast and technology professional. Always looking for the best performance parts for my collection.";
+
+  // Personal details state
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
-  const [bio, setBio] = useState("");
+  const [bio, setBio] = useState(defaultBio);
+  const [hasEditedProfile, setHasEditedProfile] = useState(false);
 
-  // Update form fields when customer data loads
-  useEffect(() => {
-    if (customer) {
-      setFullName(customer.fullName || "");
-      setEmail(customer.email || "");
-      setPhone(customer.phone || "");
-      setLocation(customer.address || "");
-      setBio("Passionate car enthusiast and technology professional. Always looking for the best performance parts for my collection.");
-    }
-  }, [customer]);
+  const resolvedFullName = hasEditedProfile ? fullName : (customer?.fullName ?? "");
+  const resolvedEmail = hasEditedProfile ? email : (customer?.email ?? "");
+  const resolvedPhone = hasEditedProfile ? phone : (customer?.phone ?? "");
+  const resolvedLocation = hasEditedProfile ? location : (customer?.address ?? "");
 
   // Password state
   const [currentPw, setCurrentPw] = useState("");
@@ -101,24 +99,24 @@ export default function ProfilePage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleSave = async () => {
-    console.log('Profile save clicked', { fullName, email, phone, location, bio });
+    console.log('Profile save clicked', { fullName: resolvedFullName, email: resolvedEmail, phone: resolvedPhone, location: resolvedLocation, bio });
     
     try {
       setIsSaving(true);
       setSaveError(null);
       
       // Validate required fields
-      if (!fullName || !email) {
+      if (!resolvedFullName || !resolvedEmail) {
         setSaveError('Name and email are required');
         return;
       }
 
       // Call the API to update profile
       const response = await CustomerProfileService.updateProfile({
-        fullName,
-        email,
-        phone,
-        address: location
+        fullName: resolvedFullName,
+        email: resolvedEmail,
+        phone: resolvedPhone,
+        address: resolvedLocation
       });
 
       console.log('Profile update response:', response);
@@ -351,25 +349,37 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Field
                       label="Full Name"
-                      value={fullName}
-                      onChange={setFullName}
+                      value={resolvedFullName}
+                      onChange={(value) => {
+                        setHasEditedProfile(true);
+                        setFullName(value);
+                      }}
                     />
                     <Field
                       label="Email Address"
-                      value={email}
-                      onChange={setEmail}
+                      value={resolvedEmail}
+                      onChange={(value) => {
+                        setHasEditedProfile(true);
+                        setEmail(value);
+                      }}
                       type="email"
                     />
                     <Field
                       label="Phone Number"
-                      value={phone}
-                      onChange={setPhone}
+                      value={resolvedPhone}
+                      onChange={(value) => {
+                        setHasEditedProfile(true);
+                        setPhone(value);
+                      }}
                       type="tel"
                     />
                     <Field
                       label="Location"
-                      value={location}
-                      onChange={setLocation}
+                      value={resolvedLocation}
+                      onChange={(value) => {
+                        setHasEditedProfile(true);
+                        setLocation(value);
+                      }}
                     />
                   </div>
 

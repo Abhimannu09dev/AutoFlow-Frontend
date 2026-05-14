@@ -1,54 +1,57 @@
 "use client";
 
-import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+
+import { useAuth } from "../contexts/AuthContext";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: "customer" | "staff";
+  requiredRole?: "customer" | "staff" | "admin";
+}
+
+function GuardShell({ label }: { label: string }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-slate-500">{label}</div>
+    </div>
+  );
 }
 
 export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        // No user logged in, redirect to login
-        router.push("/login");
-        return;
-      }
+  const roleMismatch = useMemo(() => {
+    if (!requiredRole || !user) return false;
+    return user.role !== requiredRole;
+  }, [requiredRole, user]);
 
-      if (requiredRole && user.role !== requiredRole) {
-        // User doesn't have required role, redirect to appropriate dashboard
-        if (user.role === "customer") {
-          router.push("/customer/dashboard");
-        } else {
-          router.push("/staff/dashboard");
-        }
-        return;
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+
+    if (requiredRole && user.role !== requiredRole) {
+      if (user.role === "customer") {
+        router.replace("/customer/dashboard");
+      } else if (user.role === "admin") {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/staff/dashboard");
       }
     }
-  }, [user, isLoading, router, requiredRole]);
+  }, [isLoading, requiredRole, router, user]);
 
-  // Show loading while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-500">Loading...</div>
-      </div>
-    );
+    return <GuardShell label="Loading..." />;
   }
 
-  // Show nothing while redirecting
-  if (!user || (requiredRole && user.role !== requiredRole)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-500">Redirecting...</div>
-      </div>
-    );
+  if (!user || roleMismatch) {
+    return <GuardShell label="Redirecting..." />;
   }
 
   return <>{children}</>;

@@ -1,16 +1,25 @@
 const API_BASE_URL = ''; // Use relative URLs to hit Next.js API routes
 
+export type ApiErrorType =
+  | 'None'
+  | 'NotFound'
+  | 'ValidationError'
+  | 'Conflict'
+  | 'Unauthorized'
+  | 'NetworkError'
+  | 'ServerError';
+
 export interface ApiResponse<T> {
   isSuccess: boolean;
   message: string | null;
   data: T;
-  errorType: 'None' | 'NotFound' | 'ValidationError' | 'Conflict' | 'Unauthorized';
+  errorType: ApiErrorType;
 }
 
 export interface ApiError {
   message: string;
   status: number;
-  errorType: string;
+  errorType: ApiErrorType;
 }
 
 class ApiClient {
@@ -167,7 +176,7 @@ class ApiClient {
     }
   }
 
-  private mapErrorType(errorType: number): 'None' | 'NotFound' | 'ValidationError' | 'Conflict' | 'Unauthorized' {
+  private mapErrorType(errorType: number): ApiErrorType {
     switch (errorType) {
       case 0:
         return 'None';
@@ -186,7 +195,7 @@ class ApiClient {
 
 
 
-  private getErrorType(status: number): string {
+  private getErrorType(status: number): ApiErrorType {
     switch (status) {
       case 400:
         return 'ValidationError';
@@ -205,14 +214,14 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,

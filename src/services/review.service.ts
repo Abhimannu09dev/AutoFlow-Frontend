@@ -11,7 +11,7 @@ export class ReviewService {
         isSuccess: false,
         message: apiError.message,
         data: {} as ReviewResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -25,7 +25,7 @@ export class ReviewService {
         isSuccess: false,
         message: apiError.message,
         data: [] as ReviewResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }

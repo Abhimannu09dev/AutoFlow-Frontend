@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 import { CustomerProfileService } from "../../../services/customerProfile.service";
 import type { VehicleResponseDto, CreateAppointmentRequest } from "../../../types/api";
@@ -34,7 +34,7 @@ const serviceTypes = [
 
 export function BookingForm({ vehicles, customerId }: BookingFormProps) {
   const [formData, setFormData] = useState<BookingFormData>({
-    vehicle: "",
+    vehicle: vehicles[0]?.id ?? "",
     serviceType: "oil-change-filter",
     date: null,
     time: "",
@@ -45,13 +45,6 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<BookingFormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  // Set default vehicle when vehicles are loaded
-  useEffect(() => {
-    if (vehicles.length > 0 && !formData.vehicle) {
-      setFormData(prev => ({ ...prev, vehicle: vehicles[0].id }));
-    }
-  }, [vehicles, formData.vehicle]);
 
   const validateForm = (): boolean => {
     const newErrors: BookingFormErrors = {};
@@ -142,7 +135,8 @@ export function BookingForm({ vehicles, customerId }: BookingFormProps) {
 
   const convertTo24Hour = (time12h: string): string => {
     const [time, modifier] = time12h.split(' ');
-    let [hours, minutes] = time.split(':');
+    const [rawHours, minutes] = time.split(':');
+    let hours = rawHours;
     if (hours === '12') {
       hours = '00';
     }

@@ -1,5 +1,6 @@
 import { proxyGet } from "@/services/proxy";
 
 export async function GET(request: Request) {
-  return proxyGet("/api/dashboard", request);
+  const { search } = new URL(request.url);
+  return proxyGet(`/api/dashboard${search}`, request);
 }

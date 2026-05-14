@@ -10,6 +10,16 @@ export const apiRoutes = {
   },
   customers: "/api/customers",
   appointments: "/api/appointments",
-  partsRequests: "/api/parts-requests",
+  partRequests: "/api/part-requests",
   reviews: "/api/reviews",
+  vendors: "/api/vendors",
+  parts: "/api/parts",
+  staff: "/api/staff",
+  sales: "/api/sales",
+  dashboard: "/api/dashboard",
+  purchaseInvoices: "/api/purchase-invoices",
+  admin: {
+    profile: "/api/admin/profile",
+    changePassword: "/api/admin/change-password",
+  },
 } as const;

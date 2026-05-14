@@ -6,7 +6,6 @@ import { CustomerProfileService } from "../../../services/customerProfile.servic
 import type { VehicleResponseDto } from "../../../types/api";
 import { Alert } from "../../../shared/components/ui/Alert";
 import { Input } from "../../../shared/components/ui/Input";
-import { TextArea } from "../../../shared/components/ui/TextArea";
 import { FeatureCard } from "../../../shared/components/ui/FeatureCard";
 import { StatBadge } from "../../../shared/components/ui/StatBadge";
 import { Button } from "../../../shared/components/ui/Button";
@@ -37,10 +36,6 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
         const response = await CustomerProfileService.getVehicles();
         if (response.isSuccess) {
           setVehicles(response.data);
-          // Set default vehicle
-          if (response.data.length > 0 && !formData.assignedVehicle) {
-            setFormData(prev => ({ ...prev, assignedVehicle: response.data[0].id }));
-          }
         }
       } catch (error) {
         console.error('Failed to fetch vehicles:', error);
@@ -50,7 +45,7 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
     };
 
     fetchVehicles();
-  }, [customerId, formData.assignedVehicle]);
+  }, [customerId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +127,7 @@ export function RequestPartsForm({ customerId }: RequestPartsFormProps) {
         <div className="space-y-8">
           <div>
             <h1 className="text-[36px] xl:text-[42px] font-bold text-[#0f172a] leading-tight mb-6">
-              Can't find what you're looking for?
+              Can&apos;t find what you&apos;re looking for?
             </h1>
             
             <p className="text-[16px] text-[#64748b] leading-relaxed max-w-lg">

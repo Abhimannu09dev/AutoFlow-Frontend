@@ -30,7 +30,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as CustomerResponseDto,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -52,7 +52,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as CustomerResponseDto,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -69,7 +69,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: [] as VehicleResponseDto[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -85,7 +85,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as VehicleResponseDto,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -104,7 +104,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as VehicleResponseDto,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -120,7 +120,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as VehicleResponseDto,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -137,7 +137,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: [] as SaleResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -154,7 +154,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: [] as AppointmentResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -171,7 +171,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as AppointmentResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -188,7 +188,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as PartRequestResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -205,7 +205,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: [] as PartRequestResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -222,7 +222,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: {} as ReviewResponse,
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }
@@ -239,7 +239,7 @@ export class CustomerProfileService {
         isSuccess: false,
         message: apiError.message,
         data: [] as ReviewResponse[],
-        errorType: apiError.errorType as any
+        errorType: apiError.errorType
       };
     }
   }

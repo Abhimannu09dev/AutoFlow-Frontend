@@ -1,7 +1,21 @@
 import { NextResponse } from "next/server";
 
+interface VehicleRecord {
+  id: string;
+  vehicleNumber: string;
+  brand: string;
+  model: string;
+  year: number;
+  mileage: number;
+  color: string;
+  vin: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // In-memory storage for vehicles (simulates database)
-const vehiclesStorage = new Map<string, any[]>();
+const vehiclesStorage = new Map<string, VehicleRecord[]>();
 
 // Initialize with default vehicles
 function getDefaultVehicles(userId: string) {
@@ -44,13 +58,15 @@ function getDefaultVehicles(userId: string) {
 // Helper function to extract user info from JWT token
 function getUserFromToken(authHeader: string) {
   try {
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     return {
       id: "019e08d8-c212-7e4b-91e1-f7f0297a527d",
       name: "Sarah Johnson", 
       email: "sarah.johnson@example.com",
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

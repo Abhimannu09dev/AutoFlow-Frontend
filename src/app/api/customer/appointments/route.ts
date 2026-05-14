@@ -1,18 +1,30 @@
 import { NextResponse } from "next/server";
 
+interface AppointmentRecord {
+  id: string;
+  customerId: string;
+  date: string;
+  time: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // In-memory storage for appointments (simulates database)
-const appointmentsStorage = new Map<string, any[]>();
+const appointmentsStorage = new Map<string, AppointmentRecord[]>();
 
 // Helper function to extract user info from JWT token
 function getUserFromToken(authHeader: string) {
   try {
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     return {
       id: "019e08d8-c212-7e4b-91e1-f7f0297a527d",
       name: "Sarah Johnson", 
       email: "sarah.johnson@example.com",
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

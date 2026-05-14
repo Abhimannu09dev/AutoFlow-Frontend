@@ -1,4 +1,4 @@
-import { apiClient, ApiError } from '../lib/api';
+import { ApiError } from '../lib/api';
 import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/api';
 
 export class AuthService {
@@ -26,7 +26,7 @@ export class AuthService {
           isSuccess: false,
           message: result?.Message || result?.message || 'Login failed',
           data: {} as AuthResponse,
-          errorType: 'Unauthorized' as any
+          errorType: 'Unauthorized'
         };
       }
 
@@ -60,7 +60,7 @@ export class AuthService {
         isSuccess: true,
         message: null,
         data: userData,
-        errorType: 'None' as any
+        errorType: 'None'
       };
     } catch (error) {
       console.error('AuthService: Login error caught:', error);
@@ -69,7 +69,7 @@ export class AuthService {
         isSuccess: false,
         message: apiError.message || 'Network error occurred',
         data: {} as AuthResponse,
-        errorType: 'NetworkError' as any
+        errorType: 'NetworkError'
       };
     }
   }
@@ -90,7 +90,7 @@ export class AuthService {
           isSuccess: false,
           message: result?.Message || result?.message || 'Registration failed',
           data: {} as AuthResponse,
-          errorType: 'ValidationError' as any
+          errorType: 'ValidationError'
         };
       }
 
@@ -105,7 +105,7 @@ export class AuthService {
         isSuccess: true,
         message: null,
         data: authData,
-        errorType: 'None' as any
+        errorType: 'None'
       };
     } catch (error) {
       const apiError = error as ApiError;
@@ -113,7 +113,7 @@ export class AuthService {
         isSuccess: false,
         message: apiError.message || 'Network error occurred',
         data: {} as AuthResponse,
-        errorType: 'NetworkError' as any
+        errorType: 'NetworkError'
       };
     }
   }

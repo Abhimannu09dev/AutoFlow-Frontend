@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CalendarCheck, ShoppingCart, PlusCircle, Package, CheckCircle,
-  ShoppingBag, Clock, ChevronRight, ArrowRight,
+  ShoppingBag, ChevronRight, ArrowRight,
 } from "lucide-react";
 import { DashboardLayout } from "../../../shared/components/layout/DashboardLayout";
 import { customerNavItems } from "../../../shared/constants/navigation";

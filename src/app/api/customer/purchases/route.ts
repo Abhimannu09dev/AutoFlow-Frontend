@@ -1,18 +1,46 @@
 import { NextResponse } from "next/server";
 
+interface PurchaseItemRecord {
+  id: string;
+  partId: string;
+  partName: string;
+  quantity: number;
+  unitPrice: number;
+  subTotal: number;
+}
+
+interface PurchaseRecord {
+  id: string;
+  customerId: string;
+  customerName: string;
+  staffId: string;
+  saleDate: string;
+  subTotal: number;
+  discountAmount: number;
+  totalAmount: number;
+  loyaltyDiscountApplied: boolean;
+  paymentMethod: string;
+  status: string;
+  notes: string;
+  createdAt: string;
+  items: PurchaseItemRecord[];
+}
+
 // In-memory storage for purchases (simulates database)
-const purchasesStorage = new Map<string, any[]>();
+const purchasesStorage = new Map<string, PurchaseRecord[]>();
 
 // Helper function to extract user info from JWT token
 function getUserFromToken(authHeader: string) {
   try {
-    const token = authHeader.replace('Bearer ', '');
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     return {
       id: "019e08d8-c212-7e4b-91e1-f7f0297a527d",
       name: "Sarah Johnson", 
       email: "sarah.johnson@example.com",
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
