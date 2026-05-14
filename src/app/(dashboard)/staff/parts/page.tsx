@@ -1,3 +1,3 @@
-export const metadata = { title: "Vehicle Parts Management - AutoFlow" };
+export const metadata = { title: "Parts Inventory - AutoFlow Staff" };
 
-export { default } from "@/features/admin/components/AdminVehiclePartsManagementPage";
+export { default } from "@/features/staff/components/parts/StaffPartsInventoryPage";

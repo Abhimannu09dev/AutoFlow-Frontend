@@ -14,6 +14,15 @@ export const ROUTES = {
   },
   staff: {
     dashboard: "/staff/dashboard",
+    customerReports: "/staff/customer-reports",
+    customers: "/staff/management",
+    vehicles: "/staff/repair-orders",
+    appointments: "/staff/inventory",
+    partRequests: "/staff/vendor",
+    sales: "/staff/invoices",
+    reviews: "/staff/reviews",
+    profile: "/staff/profile",
+    settings: "/staff/settings",
     inventory: "/staff/inventory",
     repairOrders: "/staff/repair-orders",
     invoices: "/staff/invoices",
@@ -23,6 +32,7 @@ export const ROUTES = {
   },
   admin: {
     dashboard: "/admin/dashboard",
+    customerReports: "/admin/customer-reports",
     users: "/admin/users",
     vendors: "/admin/vendors",
     settings: "/admin/settings",

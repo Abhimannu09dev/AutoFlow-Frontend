@@ -7,6 +7,7 @@ export const appConfig = {
 export const apiRoutes = {
   auth: {
     login: "/api/auth/login",
+    changePassword: "/api/auth/change-password",
   },
   customers: "/api/customers",
   appointments: "/api/appointments",
@@ -15,6 +16,7 @@ export const apiRoutes = {
   vendors: "/api/vendors",
   parts: "/api/parts",
   staff: "/api/staff",
+  staffSelfProfile: "/api/staff/me/profile",
   sales: "/api/sales",
   dashboard: "/api/dashboard",
   purchaseInvoices: "/api/purchase-invoices",

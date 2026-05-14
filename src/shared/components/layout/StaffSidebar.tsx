@@ -1,66 +1,110 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutGrid,
-  UserPlus,
   Users,
-  FileText,
+  Car,
+  Calendar,
+  Boxes,
+  Wrench,
+  ReceiptText,
   BarChart3,
-  Mail,
-  CirclePlus,
-  LucideIcon,
+  MessageSquare,
+  UserCircle2,
+  Settings,
+  LogOut,
+  CarFront,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const navItems: { label: string; icon: LucideIcon; href: string }[] = [
-  { label: "Dashboard",             icon: LayoutGrid, href: "/staff" },
-  { label: "Customer Registration", icon: UserPlus,   href: "/staff/customer-registration" },
-  { label: "Customer Management",   icon: Users,      href: "/staff/customer-management" },
-  { label: "Sales & Invoices",      icon: FileText,   href: "/staff/sales" },
-  { label: "Reports",               icon: BarChart3,  href: "/staff/reports" },
-  { label: "Email Service",         icon: Mail,       href: "/staff/email" },
+import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface StaffNavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+interface StaffSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const items: StaffNavItem[] = [
+  { label: "Dashboard", href: ROUTES.staff.dashboard, icon: LayoutGrid },
+  { label: "Customers", href: ROUTES.staff.customers, icon: Users },
+  { label: "Vehicles", href: ROUTES.staff.vehicles, icon: Car },
+  { label: "Appointments", href: ROUTES.staff.appointments, icon: Calendar },
+  { label: "Inventory", href: ROUTES.staff.parts, icon: Boxes },
+  { label: "Part Request", href: ROUTES.staff.partRequests, icon: Wrench },
+  { label: "Sales", href: ROUTES.staff.sales, icon: ReceiptText },
+  { label: "Customer Reports", href: ROUTES.staff.customerReports, icon: BarChart3 },
+  { label: "Reviews", href: ROUTES.staff.reviews, icon: MessageSquare },
+  { label: "Profile", href: ROUTES.staff.profile, icon: UserCircle2 },
+  { label: "Settings", href: ROUTES.staff.settings, icon: Settings },
 ];
 
-export default function StaffSidebar() {
+export default function StaffSidebar({ isOpen, onClose }: StaffSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+    router.replace("/login");
+  };
 
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-[#dfe4ee] bg-[#f3f5fa] px-3 py-8 lg:flex">
-      <div className="mb-10 px-3">
-        <h2 className="text-[20px] font-bold leading-none text-[#4338ca]">AutoFlow</h2>
-        <p className="mt-1 text-[10px] font-semibold tracking-[0.18em] text-[#6b7280]">STAFF PANEL</p>
-      </div>
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col justify-between bg-[#091426] px-4 py-6 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)] transition-transform duration-300 lg:translate-x-0 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div>
+        <div className="mb-8 flex items-center gap-3 px-2">
+          <span className="inline-flex size-10 items-center justify-center rounded-lg bg-white text-[#091426]">
+            <CarFront className="size-4" />
+          </span>
+          <div>
+            <h2 className="text-[32px] font-semibold leading-[32px] tracking-[-0.02em] text-white">AutoFlow</h2>
+            <p className="text-xs font-semibold tracking-[0.04em] text-[#bcc7de]">Staff Portal</p>
+          </div>
+        </div>
 
-      <nav className="flex-1 space-y-1">
-        {navItems.map(({ label, icon: Icon, href }) => {
-          const active = pathname === href;
-          return (
-            <Link
-              key={label}
-              href={href}
-              className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition ${
-                active
-                  ? "bg-[#eceef5] text-[#4338ca]"
-                  : "text-[#6d7785] hover:bg-[#eceef5] hover:text-[#4338ca]"
-              }`}
-            >
-              <Icon size={17} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
-              <span className="leading-tight">{label}</span>
-              {active && (
-                <span className="absolute right-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-l bg-[#4338ca]" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="space-y-1">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                  active
+                    ? "bg-[#13233d] text-[#bcc7de]"
+                    : "text-[#8590a6] hover:bg-[#0f1f38] hover:text-[#bcc7de]"
+                }`}
+              >
+                <Icon className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
       <button
         type="button"
-        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3730a3] to-[#4f46e5] text-[13px] font-semibold text-white shadow-[0_6px_14px_rgba(67,56,202,0.3)] transition hover:brightness-105"
+        onClick={handleLogout}
+        className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-[#bcc7de] hover:bg-[#0f1f38]"
       >
-        <CirclePlus size={16} aria-hidden="true" />
-        New Service
+        <LogOut className="size-4" />
+        Logout
       </button>
     </aside>
   );

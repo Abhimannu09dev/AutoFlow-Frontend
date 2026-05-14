@@ -1,36 +1,35 @@
 "use client";
 
-import { Search, Bell } from "lucide-react";
+import Link from "next/link";
+import { Bell, CircleHelp, Menu, UserCircle2 } from "lucide-react";
+import { ROUTES } from "@/config/routes";
 
 interface StaffHeaderProps {
-  userName: string;
-  userRole: string;
+  onMenuToggle: () => void;
 }
 
-export default function StaffHeader({ userName, userRole }: StaffHeaderProps) {
+export default function StaffHeader({ onMenuToggle }: StaffHeaderProps) {
   return (
-    <header className="border-b border-[#dde1ed] bg-white">
-      <div className="flex h-14 items-center justify-between px-6">
-        <label className="flex h-9 w-full max-w-sm items-center gap-2 rounded-full border border-[#e6e9f1] bg-[#f8f9fc] px-4 text-[13px] text-[#9aa4b2] cursor-text">
-          <Search size={15} aria-hidden="true" />
-          <span>Search orders, parts, or customers...</span>
-        </label>
-        <div className="ml-4 flex shrink-0 items-center gap-5">
-          <button type="button" className="flex items-center gap-1.5 text-[13px] font-medium text-[#475569] hover:text-[#1e293b]">
-            <span className="text-[15px]">?</span> Help
-          </button>
-          <button type="button" className="relative text-[#475569] hover:text-[#1e293b]">
-            <Bell size={20} aria-hidden="true" />
-            <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[#ef4444]" />
-          </button>
-          <div className="flex items-center gap-2.5">
-            <div className="text-right leading-tight">
-              <p className="text-[13px] font-semibold text-[#0f172a]">{userName}</p>
-              <p className="text-[10px] uppercase tracking-wide text-[#64748b]">{userRole}</p>
-            </div>
-            <div className="size-9 rounded-full bg-gradient-to-br from-[#ff9f7a] to-[#38bdf8] ring-2 ring-white" />
-          </div>
-        </div>
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#c5c6cd] bg-[#fbf8fa] px-4 lg:px-6">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="rounded-md p-1 text-[#1b1b1d] lg:hidden"
+          aria-label="Open menu"
+        >
+          <Menu className="size-5" />
+        </button>
+        <span className="text-2xl font-semibold text-[#091426]">AutoFlow Admin</span>
+      </div>
+
+      <div className="flex items-center gap-4 text-[#006a61]">
+        <Bell className="size-4" />
+        <CircleHelp className="size-4" />
+        <span className="hidden border-l border-[#c5c6cd] pl-4 text-sm text-[#45474c] sm:inline">Support</span>
+        <Link href={ROUTES.staff.profile} className="rounded-full bg-[#1e293b] p-1 text-white">
+          <UserCircle2 className="size-4" />
+        </Link>
       </div>
     </header>
   );
