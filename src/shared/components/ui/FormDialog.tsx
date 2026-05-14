@@ -15,6 +15,8 @@ interface FormDialogProps {
   submitDisabled?: boolean;
   errorMessage?: string | null;
   maxWidthClassName?: string;
+  headerIcon?: ReactNode;
+  closeOnBackdrop?: boolean;
   children: ReactNode;
 }
 
@@ -29,14 +31,19 @@ export default function FormDialog({
   submitDisabled = false,
   errorMessage = null,
   maxWidthClassName = "max-w-2xl",
+  headerIcon,
+  closeOnBackdrop = true,
   children,
 }: FormDialogProps) {
   return (
     <Modal
       title={title}
+      subtitle={description}
       open={open}
       onClose={onClose}
       maxWidthClassName={maxWidthClassName}
+      headerIcon={headerIcon}
+      closeOnBackdrop={closeOnBackdrop}
       footer={(
         <div className="flex justify-end gap-2">
           <button
@@ -59,7 +66,6 @@ export default function FormDialog({
       )}
     >
       <div className="space-y-4">
-        {description ? <p className="text-sm text-[#45474c]">{description}</p> : null}
         {errorMessage ? (
           <div className="rounded-lg border border-[#fecaca] bg-[#fef2f2] px-3 py-2 text-sm text-[#b91c1c]">
             {errorMessage}

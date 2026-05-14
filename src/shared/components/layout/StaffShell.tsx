@@ -1,23 +1,51 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import StaffSidebar from "./StaffSidebar";
 import StaffHeader from "./StaffHeader";
 
 interface StaffShellProps {
   children: React.ReactNode;
-  userName: string;
-  userRole: string;
+  userName?: string;
+  userRole?: string;
 }
 
-export default function StaffShell({ children, userName, userRole }: StaffShellProps) {
+export default function StaffShell({ children }: StaffShellProps) {
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  useEffect(() => {
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileNavOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#f3f5fb] text-[#1f2937]">
-      <div className="flex min-h-screen">
-        <StaffSidebar />
-        <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
-          <StaffHeader userName={userName} userRole={userRole} />
-          <main className="flex-1 overflow-y-auto px-6 py-7">
-            {children}
+    <div className="h-screen overflow-hidden bg-[#f5f3f4] text-[#1b1b1d]">
+      <div className="flex h-screen">
+        <StaffSidebar
+          isOpen={isMobileNavOpen}
+          onClose={() => setIsMobileNavOpen(false)}
+        />
+
+        {isMobileNavOpen ? (
+          <button
+            type="button"
+            className="fixed inset-0 z-30 bg-slate-900/30 lg:hidden"
+            onClick={() => setIsMobileNavOpen(false)}
+            aria-label="Close sidebar overlay"
+          />
+        ) : null}
+
+        <div className="flex h-screen min-w-0 flex-1 flex-col lg:pl-64">
+          <StaffHeader onMenuToggle={() => setIsMobileNavOpen((open) => !open)} />
+          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-6">
+            <div className="w-full">{children}</div>
           </main>
         </div>
       </div>

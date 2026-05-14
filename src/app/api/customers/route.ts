@@ -1,27 +1,11 @@
-import { NextResponse } from "next/server";
-
-const backend = () =>
-  process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+import { proxyGet, proxyRequest } from "@/services/proxy";
+import { apiRoutes } from "@/config/app.config";
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json().catch(() => null);
-    const res = await fetch(`${backend()}/api/customers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const text = await res.text();
-    return new NextResponse(text, {
-      status: res.status,
-      headers: { "content-type": res.headers.get("content-type") ?? "application/json" },
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ message }, { status: 502 });
-  }
+  return proxyRequest(request, apiRoutes.customers);
 }
 
-export async function GET() {
-  return NextResponse.json({ message: "Use POST to create customers." });
+export async function GET(request: Request) {
+  const { search } = new URL(request.url);
+  return proxyGet(`${apiRoutes.customers}${search}`, request);
 }
