@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Boxes,
+  CarFront,
   DollarSign,
   FileText,
   LayoutGrid,
@@ -66,7 +67,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       <div>
         <div className="mb-8 flex items-center gap-3 px-2">
           <span className="inline-flex size-10 items-center justify-center rounded-lg bg-white text-[#091426]">
-            <LayoutGrid className="size-4" />
+            <CarFront className="size-4" />
           </span>
           <div>
             <h2 className="text-2xl font-semibold text-white">AutoFlow</h2>

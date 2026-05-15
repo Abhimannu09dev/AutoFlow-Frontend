@@ -18,7 +18,7 @@ export default function AdminHeader({ onMenuToggle }: AdminHeaderProps) {
         >
           <Menu className="size-5" />
         </button>
-        <span className="text-2xl font-semibold text-[#091426]">AutoFlow Admin</span>
+        <span className="text-2xl font-semibold text-[#091426]">AutoFlow</span>
       </div>
       <div className="flex items-center gap-4 text-[#006a61]">
         <Bell className="size-4" />

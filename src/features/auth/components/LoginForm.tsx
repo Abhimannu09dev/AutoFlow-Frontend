@@ -78,7 +78,7 @@ export function LoginForm() {
           } else if (currentUser?.roles?.includes('Staff')) {
             router.push("/staff/dashboard");
           } else {
-            router.push("/customer/dashboard");
+            router.push("/customer");
           }
         }, 100);
       } else {

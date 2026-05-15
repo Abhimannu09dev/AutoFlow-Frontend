@@ -45,7 +45,6 @@ const items: StaffNavItem[] = [
   { label: "Customer Reports", href: ROUTES.staff.customerReports, icon: BarChart3 },
   { label: "Credit Ledger", href: ROUTES.staff.creditLedger, icon: DollarSign },
   { label: "Reviews", href: ROUTES.staff.reviews, icon: MessageSquare },
-  { label: "Profile", href: ROUTES.staff.profile, icon: UserCircle2 },
   { label: "Settings", href: ROUTES.staff.settings, icon: Settings },
 ];
 

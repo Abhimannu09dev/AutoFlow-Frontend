@@ -1,18 +1,20 @@
 import {
-  LayoutGrid, User, Car, CalendarCheck, Wrench, History, Star,
-  Users, FileText, Settings, DollarSign, Boxes, BarChart3
+  LayoutGrid, User, Car, CalendarCheck, Wrench, Star,
+  Users, FileText, Settings, DollarSign, Boxes, BarChart3, Sparkles
 } from "lucide-react";
 import { ROUTES } from "@/config/routes";
 import type { NavItem } from "../components/layout/Sidebar";
 
 export const customerNavItems: NavItem[] = [
-  { label: "Dashboard", icon: LayoutGrid, href: "/customer/dashboard" },
-  { label: "Profile", icon: User, href: "/customer/profile" },
-  { label: "Vehicles", icon: Car, href: "/customer/vehicles" },
-  { label: "Book Service", icon: CalendarCheck, href: "/customer/appointments" },
-  { label: "Request Parts", icon: Wrench, href: "/customer/parts-request" },
-  { label: "History", icon: History, href: "/customer/history" },
-  { label: "Reviews", icon: Star, href: "/customer/reviews" },
+  { label: "Dashboard", icon: LayoutGrid, href: ROUTES.customer.home },
+  { label: "My Vehicles", icon: Car, href: ROUTES.customer.vehicles },
+  { label: "Appointments", icon: CalendarCheck, href: ROUTES.customer.appointments },
+  { label: "Purchases", icon: FileText, href: ROUTES.customer.purchases },
+  { label: "Services", icon: CalendarCheck, href: ROUTES.customer.services },
+  { label: "Part Requests", icon: Wrench, href: ROUTES.customer.partRequests },
+  { label: "Reviews", icon: Star, href: ROUTES.customer.reviews },
+  { label: "Vehicle Predictions", icon: Sparkles, href: ROUTES.customer.predictions },
+  { label: "Settings", icon: Settings, href: ROUTES.customer.settings },
 ];
 
 export const staffNavItems: NavItem[] = [

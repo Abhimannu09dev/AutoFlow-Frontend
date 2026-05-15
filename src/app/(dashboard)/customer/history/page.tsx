@@ -1,7 +1,7 @@
-import HistoryPage from "../../../../features/customers/components/HistoryPage";
+import CustomerPurchasesPage from "@/features/customers/components/purchases/CustomerPurchasesPage";
 
-export const metadata = { title: "History – AutoFlow" };
+export const metadata = { title: "Purchase History – AutoFlow" };
 
 export default function CustomerHistoryPage() {
-  return <HistoryPage />;
+  return <CustomerPurchasesPage />;
 }

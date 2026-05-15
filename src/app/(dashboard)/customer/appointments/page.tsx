@@ -1,7 +1,7 @@
-import BookServicePage from "../../../../features/customers/components/BookServicePage";
+import CustomerAppointmentsPage from "@/features/customers/components/appointments/CustomerAppointmentsPage";
 
-export const metadata = { title: "Book Service – AutoFlow" };
+export const metadata = { title: "My Appointments – AutoFlow" };
 
 export default function AppointmentsPage() {
-  return <BookServicePage />;
+  return <CustomerAppointmentsPage />;
 }
