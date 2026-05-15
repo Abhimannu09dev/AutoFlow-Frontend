@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Boxes,
+  DollarSign,
   FileText,
   LayoutGrid,
   LogOut,
@@ -39,6 +40,7 @@ const items: AdminNavItem[] = [
   { label: "Purchase Invoices", href: ROUTES.admin.purchaseInvoices, icon: ReceiptText },
   { label: "Financial Reports", href: ROUTES.admin.financialReports, icon: BarChart3 },
   { label: "Customer Reports", href: ROUTES.admin.customerReports, icon: FileText },
+  { label: "Credit Ledger", href: ROUTES.admin.creditLedger, icon: DollarSign },
   { label: "Reviews", href: ROUTES.admin.reviews, icon: MessageSquare },
   { label: "Settings", href: ROUTES.admin.settings, icon: Settings },
   { label: "Analytics", href: ROUTES.admin.analytics, icon: FileText },

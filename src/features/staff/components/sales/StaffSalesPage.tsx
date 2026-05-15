@@ -4,12 +4,15 @@
 
 import {
   ArrowDownToLine,
+  Calculator,
   CalendarRange,
+  Check,
   Eye,
   MoreVertical,
   Plus,
   Receipt,
   Send,
+  Trash2,
   TrendingUp,
   Wallet,
 } from "lucide-react";
@@ -19,8 +22,6 @@ import StaffShell from "@/shared/components/layout/StaffShell";
 import {
   EmptyState,
   ErrorState,
-  FormDialog,
-  Input,
   LoadingState,
   Modal,
   SearchInput,
@@ -42,6 +43,15 @@ type SaleCreateForm = {
   items: SaleItemFormRow[];
 };
 
+type SaleItemDraftRow = {
+  partId: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  stockQuantity: number;
+  partLabel: string;
+};
+
 type DateFilterMode = "all" | "date" | "month" | "year";
 type SendInvoiceResponse = {
   saleId?: string;
@@ -58,6 +68,8 @@ const defaultCreateForm: SaleCreateForm = {
 };
 
 const pageSize = 6;
+const loyaltyThreshold = 5000;
+const loyaltyRate = 0.1;
 
 function statusChipClass(status: string | undefined): string {
   const lowered = (status ?? "pending").toLowerCase();
@@ -134,6 +146,10 @@ export default function StaffSalesPage() {
   const customerNameById = useMemo(() => {
     return new Map(customers.map((row) => [row.id, row.fullName]));
   }, [customers]);
+
+  const partById = useMemo(() => {
+    return new Map(parts.map((row) => [row.id, row]));
+  }, [parts]);
 
   const normalizedRows = useMemo(() => {
     return rows.map((row) => {
@@ -308,15 +324,32 @@ export default function StaffSalesPage() {
       return;
     }
 
-    const validItems = createForm.items
-      .map((item) => ({
-        partId: item.partId,
-        quantity: Number(item.quantity),
-      }))
-      .filter((item) => item.partId && Number.isFinite(item.quantity) && item.quantity > 0);
+    const parsedItems = createForm.items.map((item) => ({
+      partId: item.partId,
+      quantity: Number(item.quantity),
+    }));
 
-    if (validItems.length === 0) {
+    if (parsedItems.length === 0) {
       setCreateError("At least one valid sale item is required.");
+      return;
+    }
+
+    const hasInvalidRow = parsedItems.some(
+      (item) => !item.partId || !Number.isFinite(item.quantity) || item.quantity <= 0
+    );
+    if (hasInvalidRow) {
+      setCreateError("Each line item requires a part and quantity greater than zero.");
+      return;
+    }
+
+    const stockLimitedRow = parsedItems.find((item) => {
+      const part = partById.get(item.partId);
+      const stock = toNumber(part?.stockQuantity);
+      return stock > 0 && item.quantity > stock;
+    });
+    if (stockLimitedRow) {
+      const partLabel = partById.get(stockLimitedRow.partId)?.partName ?? "Selected part";
+      setCreateError(`${partLabel} exceeds available stock for the selected quantity.`);
       return;
     }
 
@@ -329,7 +362,7 @@ export default function StaffSalesPage() {
         customerId: createForm.customerId,
         paymentMethod: createForm.paymentMethod,
         notes: createForm.notes.trim() || null,
-        items: validItems,
+        items: parsedItems,
       }),
     });
 
@@ -345,6 +378,29 @@ export default function StaffSalesPage() {
     setActionMessage("Sale created successfully.");
     await load();
   };
+
+  const createDraftRows = useMemo<SaleItemDraftRow[]>(() => {
+    return createForm.items.map((item) => {
+      const quantity = Math.max(0, Number(item.quantity) || 0);
+      const selectedPart = partById.get(item.partId);
+      const unitPrice = toNumber(selectedPart?.sellingPrice ?? selectedPart?.unitPrice);
+      return {
+        partId: item.partId,
+        quantity,
+        unitPrice,
+        lineTotal: quantity * unitPrice,
+        stockQuantity: toNumber(selectedPart?.stockQuantity),
+        partLabel: selectedPart?.partName ?? selectedPart?.partNumber ?? selectedPart?.id ?? "Part / Service",
+      };
+    });
+  }, [createForm.items, partById]);
+
+  const createSummary = useMemo(() => {
+    const subtotal = createDraftRows.reduce((sum, row) => sum + row.lineTotal, 0);
+    const loyaltyDiscount = subtotal > loyaltyThreshold ? subtotal * loyaltyRate : 0;
+    const totalAmount = Math.max(subtotal - loyaltyDiscount, 0);
+    return { subtotal, loyaltyDiscount, totalAmount };
+  }, [createDraftRows]);
 
   return (
     <StaffShell>
@@ -675,122 +731,230 @@ export default function StaffSalesPage() {
         ) : null}
       </Modal>
 
-      <FormDialog
+      <Modal
         title="Create Sale"
-        description="Record a new sales transaction"
+        subtitle="Record a new transaction"
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onSubmit={() => void onCreateSale()}
-        submitLabel="Create Sale"
-        isSubmitting={createSubmitting}
-        errorMessage={createError}
-        maxWidthClassName="max-w-4xl"
-        headerIcon={<Receipt className="size-5" />}
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-[#1b1b1d]">Customer</label>
-            <select
-              value={createForm.customerId}
-              onChange={(event) => setCreateForm((prev) => ({ ...prev, customerId: event.target.value }))}
-              className="h-10 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
-            >
-              <option value="">Select customer</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>{customer.fullName}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-[#1b1b1d]">Payment Method</label>
-            <select
-              value={createForm.paymentMethod}
-              onChange={(event) =>
-                setCreateForm((prev) => ({
-                  ...prev,
-                  paymentMethod: event.target.value as SaleCreateForm["paymentMethod"],
-                }))
-              }
-              className="h-10 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
-            >
-              <option value="Cash">Cash</option>
-              <option value="Credit">Credit</option>
-              <option value="Card">Card</option>
-            </select>
-          </div>
-
-          <TextArea
-            label="Notes"
-            value={createForm.notes}
-            onChange={(event) => setCreateForm((prev) => ({ ...prev, notes: event.target.value }))}
-            placeholder="Optional notes"
-            rows={4}
-          />
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-[#1b1b1d]">Items</p>
-            {createForm.items.map((item, index) => (
-              <div key={`${item.partId}-${index}`} className="grid gap-2 md:grid-cols-[1fr_120px_auto]">
-                <select
-                  value={item.partId}
-                  onChange={(event) => {
-                    const partId = event.target.value;
-                    setCreateForm((prev) => ({
-                      ...prev,
-                      items: prev.items.map((row, rowIndex) =>
-                        rowIndex === index ? { ...row, partId } : row
-                      ),
-                    }));
-                  }}
-                  className="h-10 rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
-                >
-                  <option value="">Select part</option>
-                  {parts.map((part) => (
-                    <option key={part.id} value={part.id}>{part.partName ?? part.partNumber ?? part.id}</option>
-                  ))}
-                </select>
-                <Input
-                  type="number"
-                  min="1"
-                  value={item.quantity}
-                  onChange={(event) => {
-                    const quantity = event.target.value;
-                    setCreateForm((prev) => ({
-                      ...prev,
-                      items: prev.items.map((row, rowIndex) =>
-                        rowIndex === index ? { ...row, quantity } : row
-                      ),
-                    }));
-                  }}
-                  placeholder="Qty"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCreateForm((prev) => ({
-                      ...prev,
-                      items: prev.items.length <= 1
-                        ? prev.items
-                        : prev.items.filter((_, rowIndex) => rowIndex !== index),
-                    }));
-                  }}
-                  className="rounded-lg border border-[#c5c6cd] px-3 py-2 text-sm text-[#45474c]"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
+        maxWidthClassName="max-w-6xl"
+        headerIcon={<Calculator className="size-5" />}
+        footer={(
+          <div className="flex items-center justify-end gap-2">
             <button
               type="button"
-              onClick={() => setCreateForm((prev) => ({ ...prev, items: [...prev.items, { partId: "", quantity: "1" }] }))}
-              className="rounded-lg border border-[#c5c6cd] px-3 py-2 text-sm font-medium text-[#006a61]"
+              onClick={() => setCreateOpen(false)}
+              className="rounded-lg border border-[#c5c6cd] px-4 py-2 text-sm font-medium text-[#45474c]"
+              disabled={createSubmitting}
             >
-              Add Item
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void onCreateSale()}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#006a61] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              disabled={createSubmitting}
+            >
+              <Check className="size-4" />
+              {createSubmitting ? "Creating..." : "Create Sale"}
             </button>
           </div>
+        )}
+      >
+        <div className="space-y-5">
+          {createError ? (
+            <div className="rounded-lg border border-[#fecaca] bg-[#fef2f2] px-3 py-2 text-sm text-[#b91c1c]">
+              {createError}
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="space-y-1.5">
+              <span className="text-sm font-medium text-[#1b1b1d]">Customer</span>
+              <select
+                value={createForm.customerId}
+                onChange={(event) => setCreateForm((prev) => ({ ...prev, customerId: event.target.value }))}
+                className="h-11 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
+              >
+                <option value="">Select customer</option>
+                {customers.map((customer) => (
+                  <option key={customer.id} value={customer.id}>{customer.fullName}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1.5">
+              <span className="text-sm font-medium text-[#1b1b1d]">Payment Method</span>
+              <select
+                value={createForm.paymentMethod}
+                onChange={(event) =>
+                  setCreateForm((prev) => ({
+                    ...prev,
+                    paymentMethod: event.target.value as SaleCreateForm["paymentMethod"],
+                  }))
+                }
+                className="h-11 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
+              >
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="Credit">Credit</option>
+              </select>
+            </label>
+          </div>
+
+          {createForm.paymentMethod === "Credit" ? (
+            <div className="rounded-lg border border-[#bae6fd] bg-[#f0f9ff] px-3 py-2 text-xs text-[#0c4a6e]">
+              Credit sales are supported. Due date is automatically set by backend to 30 days from sale date.
+            </div>
+          ) : null}
+
+          <div className="overflow-hidden rounded-lg border border-[#dfe0e6] bg-white">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px]">
+                <thead>
+                  <tr className="bg-[#f5f3f4] text-left text-xs font-semibold uppercase tracking-[0.06em] text-[#5e6068]">
+                    <th className="px-4 py-3">Part / Service</th>
+                    <th className="w-[120px] px-4 py-3">Qty</th>
+                    <th className="w-[170px] px-4 py-3 text-right">Price</th>
+                    <th className="w-[170px] px-4 py-3 text-right">Line Total</th>
+                    <th className="w-[80px] px-4 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {createForm.items.map((item, index) => {
+                    const row = createDraftRows[index];
+                    const hasStockIssue = row && row.stockQuantity > 0 && row.quantity > row.stockQuantity;
+                    return (
+                      <tr key={`${item.partId}-${index}`} className="border-t border-[#e5e7eb] align-top text-sm">
+                        <td className="px-4 py-3">
+                          <select
+                            value={item.partId}
+                            onChange={(event) => {
+                              const partId = event.target.value;
+                              setCreateForm((prev) => ({
+                                ...prev,
+                                items: prev.items.map((existingRow, rowIndex) =>
+                                  rowIndex === index ? { ...existingRow, partId } : existingRow
+                                ),
+                              }));
+                            }}
+                            className="h-10 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
+                          >
+                            <option value="">Select part</option>
+                            {parts.map((part) => (
+                              <option key={part.id} value={part.id}>
+                                {part.partName ?? part.partNumber ?? part.id}
+                              </option>
+                            ))}
+                          </select>
+                          {hasStockIssue ? (
+                            <p className="mt-1 text-xs text-[#b91c1c]">
+                              Available stock: {row.stockQuantity}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(event) => {
+                              const quantity = event.target.value;
+                              setCreateForm((prev) => ({
+                                ...prev,
+                                items: prev.items.map((existingRow, rowIndex) =>
+                                  rowIndex === index ? { ...existingRow, quantity } : existingRow
+                                ),
+                              }));
+                            }}
+                            className="h-10 w-full rounded-lg border border-[#c5c6cd] bg-white px-3 text-sm"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-[#374151]">
+                          {toCurrency(row?.unitPrice ?? 0)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-[#1f2937]">
+                          {toCurrency(row?.lineTotal ?? 0)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreateForm((prev) => ({
+                                ...prev,
+                                items:
+                                  prev.items.length <= 1
+                                    ? prev.items
+                                    : prev.items.filter((_, rowIndex) => rowIndex !== index),
+                              }));
+                            }}
+                            aria-label="Remove line item"
+                            className="rounded-md p-2 text-[#ef4444] hover:bg-[#fef2f2]"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="border-t border-[#e5e7eb] px-4 py-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setCreateForm((prev) => ({
+                    ...prev,
+                    items: [...prev.items, { partId: "", quantity: "1" }],
+                  }))
+                }
+                className="inline-flex items-center gap-2 rounded-lg border border-[#c5c6cd] px-3 py-2 text-sm font-medium text-[#006a61]"
+              >
+                <Plus className="size-4" />
+                Add Item
+              </button>
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[1.35fr_1fr]">
+            <TextArea
+              label="Notes"
+              value={createForm.notes}
+              onChange={(event) => setCreateForm((prev) => ({ ...prev, notes: event.target.value }))}
+              placeholder="Optional notes for this transaction..."
+              rows={6}
+            />
+
+            <aside className="rounded-xl border border-[#b7e1dc] bg-gradient-to-b from-[#f2fbfa] to-[#e6f5f3] p-4">
+              <h3 className="mb-3 text-base font-semibold text-[#1b1b1d]">Order Summary</h3>
+              <dl className="space-y-2 text-sm">
+                <div className="flex items-center justify-between text-[#374151]">
+                  <dt>Subtotal</dt>
+                  <dd className="font-medium">{toCurrency(createSummary.subtotal)}</dd>
+                </div>
+                <div className="flex items-center justify-between text-[#0f766e]">
+                  <dt>Loyalty Discount Applied</dt>
+                  <dd className="font-medium">
+                    {createSummary.loyaltyDiscount > 0 ? `- ${toCurrency(createSummary.loyaltyDiscount)}` : toCurrency(0)}
+                  </dd>
+                </div>
+                <div className="rounded-md border border-[#cbd5e1] bg-white px-3 py-2 text-xs text-[#475569]">
+                  Loyalty discount automatically applies at 10% for orders over {toCurrency(loyaltyThreshold)}.
+                </div>
+                <div className="mt-2 border-t border-[#9fd1ca] pt-2">
+                  <div className="flex items-center justify-between text-base font-semibold text-[#1b1b1d]">
+                    <span>Total Amount</span>
+                    <span>{toCurrency(createSummary.totalAmount)}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-[#52606d]">
+                  Backend calculates final discount and total. Additional manual discount is not supported by current sales API.
+                </p>
+              </dl>
+            </aside>
+          </div>
         </div>
-      </FormDialog>
+      </Modal>
     </StaffShell>
   );
 }
