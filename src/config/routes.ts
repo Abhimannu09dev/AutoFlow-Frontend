@@ -15,6 +15,7 @@ export const ROUTES = {
   staff: {
     dashboard: "/staff/dashboard",
     customerReports: "/staff/customer-reports",
+    creditLedger: "/staff/credit-ledger",
     customers: "/staff/management",
     vehicles: "/staff/repair-orders",
     appointments: "/staff/inventory",
@@ -33,6 +34,7 @@ export const ROUTES = {
   admin: {
     dashboard: "/admin/dashboard",
     customerReports: "/admin/customer-reports",
+    creditLedger: "/admin/credit-ledger",
     users: "/admin/users",
     vendors: "/admin/vendors",
     settings: "/admin/settings",
