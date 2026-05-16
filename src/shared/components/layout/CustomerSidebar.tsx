@@ -1,27 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  LayoutGrid,
-  User,
-  Car,
-  CalendarCheck,
-  Wrench,
-  History,
-  Star,
-  LucideIcon,
-} from "lucide-react";
+import { CarFront, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
-const navItems: { label: string; icon: LucideIcon; href: string }[] = [
-  { label: "Dashboard",     icon: LayoutGrid,   href: "/customer" },
-  { label: "Profile",       icon: User,         href: "/customer/profile" },
-  { label: "Vehicles",      icon: Car,          href: "/customer/vehicles" },
-  { label: "Book Service",  icon: CalendarCheck,href: "/customer/book-service" },
-  { label: "Request Parts", icon: Wrench,       href: "/customer/request-parts" },
-  { label: "History",       icon: History,      href: "/customer/history" },
-  { label: "Reviews",       icon: Star,         href: "/customer/reviews" },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { customerNavItems } from "@/shared/constants/navigation";
 
 interface CustomerSidebarProps {
   userName: string;
@@ -30,45 +14,67 @@ interface CustomerSidebarProps {
 
 export default function CustomerSidebar({ userName, userRole }: CustomerSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/login");
+  };
 
   return (
-    <aside className="hidden w-52 shrink-0 flex-col border-r border-[#dfe4ee] bg-white px-3 py-7 lg:flex">
-      <div className="mb-8 px-3">
-        <h2 className="text-[18px] font-bold leading-none text-[#4338ca]">AutoFlow</h2>
-        <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#94a3b8]">
-          Manage Your Vehicles
-        </p>
+    <aside className="hidden w-64 shrink-0 flex-col justify-between bg-[#091426] px-4 py-6 lg:flex">
+      <div>
+        <div className="mb-8 flex items-center gap-3 px-2">
+          <span className="inline-flex size-10 items-center justify-center rounded-lg bg-white text-[#091426]">
+            <CarFront className="size-4" />
+          </span>
+          <div>
+            <h2 className="text-[32px] font-semibold leading-[32px] tracking-[-0.02em] text-white">AutoFlow</h2>
+            <p className="text-xs font-semibold tracking-[0.04em] text-[#bcc7de]">Customer Portal</p>
+          </div>
+        </div>
+
+        <nav className="space-y-1">
+          {customerNavItems.map(({ label, icon: Icon, href }) => {
+            const active =
+              href === "/customer"
+                ? pathname === "/customer" || pathname === "/customer/dashboard"
+                : pathname === href || pathname.startsWith(`${href}/`);
+
+            return (
+              <Link
+                key={label}
+                href={href}
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                  active ? "bg-[#13233d] text-[#bcc7de]" : "text-[#8590a6] hover:bg-[#0f1f38] hover:text-[#bcc7de]"
+                }`}
+              >
+                <Icon size={16} className="shrink-0" />
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      <nav className="flex-1 space-y-0.5">
-        {navItems.map(({ label, icon: Icon, href }) => {
-          const active = pathname === href;
-          return (
-            <Link
-              key={label}
-              href={href}
-              className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition ${
-                active
-                  ? "bg-[#eef0fb] text-[#4338ca]"
-                  : "text-[#64748b] hover:bg-[#f5f6fb] hover:text-[#4338ca]"
-              }`}
-            >
-              <Icon size={16} strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
-              {label}
-              {active && (
-                <span className="absolute right-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-l bg-[#4338ca]" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-[#e8eaf2] bg-[#f8f9fc] px-3 py-2.5">
-        <div className="size-8 shrink-0 rounded-full bg-gradient-to-br from-[#c084fc] to-[#818cf8]" />
-        <div className="min-w-0">
-          <p className="truncate text-[12px] font-semibold text-[#1e293b]">{userName}</p>
-          <p className="text-[10px] uppercase tracking-wide text-[#94a3b8]">{userRole}</p>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2.5 px-3 py-2.5">
+          {/* <div className="size-8 shrink-0 rounded-full bg-gradient-to-br from-[#22d3ee] to-[#0ea5e9]" /> */}
+          <div className="min-w-0">
+            {/* <p className="truncate text-[12px] font-semibold text-[#e2e8f0]">{userName}</p> */}
+            {/* <p className="text-[10px] uppercase tracking-[0.05em] text-[#94a3b8]">{userRole}</p> */}
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-[#bcc7de] transition hover:bg-[#0f1f38]"
+        >
+          <LogOut className="size-4" />
+          Logout
+        </button>
       </div>
     </aside>
   );

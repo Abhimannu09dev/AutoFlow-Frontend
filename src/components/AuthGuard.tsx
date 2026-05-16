@@ -37,7 +37,7 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
 
     if (requiredRole && user.role !== requiredRole) {
       if (user.role === "customer") {
-        router.replace("/customer/dashboard");
+        router.replace("/customer");
       } else if (user.role === "admin") {
         router.replace("/admin/dashboard");
       } else {

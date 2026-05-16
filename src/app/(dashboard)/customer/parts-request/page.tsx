@@ -1,7 +1,7 @@
-import RequestPartsPage from "../../../../features/customers/components/RequestPartsPage";
+import CustomerPartRequestsPage from "@/features/customers/components/part-requests/CustomerPartRequestsPage";
 
-export const metadata = { title: "Request Parts – AutoFlow" };
+export const metadata = { title: "Part Requests – AutoFlow" };
 
 export default function PartsRequestPage() {
-  return <RequestPartsPage />;
+  return <CustomerPartRequestsPage />;
 }

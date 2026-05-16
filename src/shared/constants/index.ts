@@ -6,7 +6,7 @@ export const ROUTES = {
   login: "/login",
   signup: "/signup",
   forgotPassword: "/forgot-password",
-  customerDashboard: "/customer/dashboard",
+  customerDashboard: "/customer",
   customerVehicles: "/customer/vehicles",
   customerProfile: "/customer/profile",
   customerAppointments: "/customer/appointments",
